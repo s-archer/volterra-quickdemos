@@ -19,5 +19,5 @@ module "nginx" {
   security_groups  = [aws_security_group.nginx.id]
   key_name         = aws_key_pair.demo.key_name
   prefix           = var.prefix
-  uk_se           = var.uk_se_name
+  uk_se            = var.uk_se_name
 }

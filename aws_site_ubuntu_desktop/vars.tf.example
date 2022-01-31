@@ -1,0 +1,62 @@
+locals {
+  azs = [
+    for each_az in var.azs_short : format("%s%s", var.region, each_az)
+  ]
+}
+
+variable "region" {
+  description = "AWS region name"
+  default     = "eu-west-2"
+}
+variable "azs_short" {
+  description = "Assumes three AZs within region.  Locals below will format the full AZ names based on Region"
+  default     = ["a", "b", "c"]
+}
+variable "cidr" {
+  description = "cidr used for AWS VPC"
+  default     = "10.0.0.0/16"
+}
+variable "prefix" {
+  description = "prefix used for naming objects created in AWS"
+  default     = "my-volt-ubuntu-"
+}
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "my-name"
+}
+
+variable "volterra_namespace_exists" {
+  type        = string
+  description = "Flag to create or use existing volterra namespace"
+  default     = true
+}
+
+variable "volterra_namespace" {
+  type        = string
+  description = "Volterra app namespace where the object will be created. This cannot be system or shared ns."
+  default     = "my-namespace"
+}
+
+variable "site_name" {
+  type        = string
+  description = "Name of site to be created in Volterra and AWS"
+  default     = "my-site"
+}
+
+variable "ubuntu_domain" {
+  type        = string
+  description = "FQDN for the app. If you have delegated domain `prod.example.com`, then your app_domain can be `<app_name>.prod.example.com`"
+  default     = "ubuntu.emea-ent.f5demos.com"
+}
+
+variable "cloud_cred_name" {
+  type        = string
+  description = "The object name for your cloud credentials witin Volterra"
+  default     = "my-cloud-creds"
+}
+
+variable "volt_tenant" {
+  type        = string
+  description = "Volterra tenant name"
+  default     = "my-tenant-abcde"
+}
