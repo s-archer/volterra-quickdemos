@@ -63,7 +63,6 @@ resource "null_resource" "wait-for-site" {
 }
 
 resource "volterra_tf_params_action" "site" {
-
   depends_on      = [null_resource.wait-for-site]
   site_name       = var.site_name
   site_kind       = "aws_vpc_site"

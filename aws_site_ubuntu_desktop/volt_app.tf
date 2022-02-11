@@ -1,4 +1,16 @@
-resource "volterra_origin_pool" "arch-ubuntu-tf" {
+resource "volterra_healthcheck" "ubuntu-tf" {
+  name      = "${var.uk_se_name}-ubuntu-tf"
+  namespace = var.volterra_namespace
+
+  tcp_health_check {
+  }
+  healthy_threshold   = 3
+  interval            = 15
+  timeout             = 3
+  unhealthy_threshold = 1
+}
+
+resource "volterra_origin_pool" "ubuntu-tf" {
   name                   = "${var.uk_se_name}-ubuntu-tf"
   namespace              = var.volterra_namespace
   description            = "${var.uk_se_name}-ubuntu-tf"
@@ -37,9 +49,13 @@ resource "volterra_origin_pool" "arch-ubuntu-tf" {
     }
     use_host_header_as_sni = true
   }
+  healthcheck {
+      name      = volterra_healthcheck.ubuntu-tf.name
+      namespace = var.volterra_namespace
+  }
 }
 
-resource "volterra_http_loadbalancer" "arch-ubuntu-tf" {
+resource "volterra_http_loadbalancer" "ubuntu-tf" {
   name      = "${var.uk_se_name}-ubuntu-tf"
   namespace = var.volterra_namespace
   domains   = [var.ubuntu_domain]
@@ -68,7 +84,7 @@ resource "volterra_http_loadbalancer" "arch-ubuntu-tf" {
 
   default_route_pools {
     pool {
-      name      = volterra_origin_pool.arch-ubuntu-tf.name
+      name      = volterra_origin_pool.ubuntu-tf.name
       namespace = var.volterra_namespace
     }
     weight = 1
@@ -99,7 +115,7 @@ resource "volterra_route" "ubuntu-route-tf" {
       timeout           = 3600
       destinations {
         cluster {
-          name      = format("ves-io-origin-pool-%s", volterra_origin_pool.arch-ubuntu-tf.name)
+          name      = format("ves-io-origin-pool-%s", volterra_origin_pool.ubuntu-tf.name)
           namespace = var.volterra_namespace
         }
         weight = 1

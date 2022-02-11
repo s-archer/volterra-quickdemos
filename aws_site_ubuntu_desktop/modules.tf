@@ -1,5 +1,7 @@
 module "ubuntu" {
+  
   depends_on      = [volterra_tf_params_action.site]
+
   source          = "./ubuntu_desktop_module"
   count           = 1
   subnet          = aws_subnet.volterra_worker.id
