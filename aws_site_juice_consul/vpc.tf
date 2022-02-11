@@ -32,33 +32,33 @@ resource "aws_subnet" "volterra_worker" {
   }
 }
 
-# resource "aws_internet_gateway" "volt" {
-#   vpc_id = aws_vpc.volt.id
+resource "aws_internet_gateway" "volt" {
+  vpc_id = aws_vpc.volt.id
 
-#   tags = {
-#     Name = "${var.prefix}igw"
-#   }
-# }
+  tags = {
+    Name = "${var.prefix}igw"
+  }
+}
 
-# resource "aws_default_route_table" "default" {
-#   default_route_table_id = aws_vpc.volt.default_route_table_id
+resource "aws_default_route_table" "default" {
+  default_route_table_id = aws_vpc.volt.default_route_table_id
 
-#   route {
-#     gateway_id = aws_internet_gateway.volt.id
-#     cidr_block = "0.0.0.0/0"
-#   }
+  route {
+    gateway_id = aws_internet_gateway.volt.id
+    cidr_block = "0.0.0.0/0"
+  }
 
-#   tags = {
-#     Name = "defult rt"
-#   }
-# }
+  tags = {
+    Name = "defult rt"
+  }
+}
 
-# resource "aws_route_table_association" "volterra_outside" {
-#   subnet_id      = aws_subnet.volterra_outside.id
-#   route_table_id = aws_vpc.volt.default_route_table_id
-# }
+resource "aws_route_table_association" "volterra_outside" {
+  subnet_id      = aws_subnet.volterra_outside.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}
 
-# resource "aws_route_table_association" "volterra_inside" {
-#   subnet_id      = aws_subnet.volterra_inside.id
-#   route_table_id = aws_vpc.volt.default_route_table_id
-# }
+resource "aws_route_table_association" "volterra_inside" {
+  subnet_id      = aws_subnet.volterra_inside.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}

@@ -27,7 +27,7 @@ resource "volterra_discovery" "consul" {
       ref {
         name      = volterra_aws_vpc_site.site.name
         namespace = volterra_aws_vpc_site.site.namespace
-        tenant    = "f5-emea-ent-bceuutam"
+        tenant    = var.volt_tenant
       }
     }
   }

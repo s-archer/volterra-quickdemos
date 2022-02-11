@@ -22,7 +22,6 @@ resource "volterra_healthcheck" "juice-tf" {
   unhealthy_threshold = 5
 }
 
-
 resource "volterra_origin_pool" "juice-tf" {
   name                   = "${var.uk_se_name}-juice-tf"
   namespace              = var.volterra_namespace

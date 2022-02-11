@@ -1,6 +1,6 @@
 
 module "consul" {
-  depends_on      = [volterra_tf_params_action.site]
+  # depends_on      = [volterra_tf_params_action.site]
   source          = "./consul_module"
   count           = 1
   subnet          = aws_subnet.volterra_worker.id
@@ -11,7 +11,7 @@ module "consul" {
 }
 
 module "nginx" {
-  depends_on       = [volterra_tf_params_action.site]
+  # depends_on       = [volterra_tf_params_action.site]
   source           = "./nginx_module"
   count            = 1
   desired_capacity = 2

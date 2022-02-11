@@ -56,7 +56,6 @@ resource "volterra_aws_vpc_site" "site" {
   no_worker_nodes = true
 }
 
-
 resource "null_resource" "wait-for-site" {
   triggers = {
     depends = volterra_aws_vpc_site.site.id
