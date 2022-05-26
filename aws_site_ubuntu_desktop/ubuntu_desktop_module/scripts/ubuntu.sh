@@ -1,9 +1,4 @@
 #!/bin/bash
-# cat << EOF > /etc/dhcp/dhclient.conf
-# timeout 300;
-# supersede domain-name-servers ${volt_ip}
-# EOF
-# dhclient
 
 #############################
 # CONFIGURE LOGGING
@@ -38,3 +33,13 @@ do
 done
 apt update
 apt install nmap -y
+
+#############################
+# Replace /etc/resolv.conf
+#############################
+
+rm /etc/resolv.conf
+cat << EOF > /etc/resolv.conf
+nameserver 127.0.0.53
+nameserver ${volt_ip}
+EOF

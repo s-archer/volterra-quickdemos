@@ -85,3 +85,14 @@ data "aws_instances" "volt" {
     values = [aws_subnet.volterra_outside.id]
   }
 }
+
+data "aws_network_interface" "dns-ip" {
+  filter {
+    name = "tag:ves-io-site-name" 
+    values = ["arch-aws-ubuntu-site"]
+  }
+  filter {  
+    name = "tag:ves.io/interface-type"
+    values = ["site-local-inside"]
+  }
+}

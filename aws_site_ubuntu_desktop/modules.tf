@@ -8,6 +8,6 @@ module "ubuntu" {
   security_groups = [aws_security_group.ubuntu.id]
   key_name        = aws_key_pair.demo.key_name
   prefix          = var.prefix
-  volt_ip         = one(data.aws_instances.volt.private_ips)
+  volt_ip         = data.aws_network_interface.dns-ip.private_ip
   uk_se           = var.uk_se_name
 }
