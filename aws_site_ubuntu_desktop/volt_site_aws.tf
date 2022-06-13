@@ -76,7 +76,7 @@ data "aws_network_interface" "dns-ip" {
   ]
   filter {
     name = "tag:ves-io-site-name" 
-    values = ["arch-aws-ubuntu-site"]
+    values = [var.site_name]
   }
   filter {  
     name = "tag:ves.io/interface-type"
