@@ -8,7 +8,7 @@ do
   if [[ $STATUS == *"200"* ]]; then
     echo "Got 200! NGINX is Ready!"
     break
-  elif [ $CNT -le 120 ]; then
+  elif [ $CNT -le 600 ]; then
     echo "Status code: $STATUS  Not done yet..."
     CNT=$[$CNT+1]
   else
@@ -124,6 +124,8 @@ sleep 10
 # sudo docker-compose up -d
 
 echo "--- DOCKER PULL JUICE SHOP ---"
-docker pull bkimminich/juice-shop
+#docker pull bkimminich/juice-shop
+docker pull arch8472/arch-juice:js-in-index
 echo "--- DOCKER RUN JUICE SHOP ---"
-docker run -d -p 80:3000 bkimminich/juice-shop
+#docker run -d -p 80:3000 bkimminich/juice-shop
+docker run -d -p 80:3000 arch8472/arch-juice:js-in-index
