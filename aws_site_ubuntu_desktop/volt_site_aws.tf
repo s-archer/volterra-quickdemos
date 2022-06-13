@@ -70,23 +70,10 @@ resource "volterra_tf_params_action" "site" {
   wait_for_action = true
 }
 
-
-data "aws_instances" "volt" {
+data "aws_network_interface" "dns-ip" {
   depends_on = [
     volterra_tf_params_action.site
   ]
-
-  instance_tags = {
-    Name = "master-0"
-  }
-
-  filter {
-    name   = "subnet-id"
-    values = [aws_subnet.volterra_outside.id]
-  }
-}
-
-data "aws_network_interface" "dns-ip" {
   filter {
     name = "tag:ves-io-site-name" 
     values = ["arch-aws-ubuntu-site"]
