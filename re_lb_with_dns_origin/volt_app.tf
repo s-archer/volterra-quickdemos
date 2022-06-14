@@ -31,8 +31,8 @@ resource "volterra_origin_pool" "origin" {
     use_host_header_as_sni = true
   }
   healthcheck {
-      name      = volterra_healthcheck.health.name
-      namespace = var.volterra_namespace
+    name      = volterra_healthcheck.health.name
+    namespace = var.volterra_namespace
   }
 }
 
@@ -56,7 +56,7 @@ resource "volterra_http_loadbalancer" "lb" {
     no_mtls                = true
     default_header         = true
     disable_path_normalize = true
-    
+
 
     tls_config {
       default_security = true
@@ -72,7 +72,7 @@ resource "volterra_http_loadbalancer" "lb" {
   }
   routes {
     simple_route {
-      http_method  = "ANY"
+      http_method = "ANY"
       path {
         regex = "(.*?)"
       }
