@@ -12,8 +12,8 @@ terraform {
 }
 
 provider "volterra" {
-  api_p12_file = "../../creds/f5-emea-ent.console.ves.volterra.io.api-creds.p12"
-  url          = "https://f5-emea-ent.console.ves.volterra.io/api"
+  api_p12_file = var.volt_api_p12_file
+  url          = var.volt_api_url
 }
 
 provider "aws" {

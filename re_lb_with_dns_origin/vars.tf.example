@@ -1,25 +1,21 @@
-locals {
-  azs = [
-    for each_az in var.azs_short : format("%s%s", var.region, each_az)
-  ]
+variable "vanity_fqdn" {
+  type        = string
+  description = "Vanity FQDN for the app"
+  default     = "vanity.example.com"
 }
 
-variable "region" {
-  description = "AWS region name"
-  default     = "eu-west-2"
+variable "lb_fqdn" {
+  type        = string
+  description = "FQDN for the app. If you have delegated domain `prod.example.com`, then your app_domain can be `<app_name>.prod.example.com`"
+  default     = "app.prod.example.com"
 }
-variable "azs_short" {
-  description = "Assumes three AZs within region.  Locals below will format the full AZ names based on Region"
-  default     = ["a", "b", "c"]
+
+variable "short_name" {
+  type        = string
+  description = "Unique short name for the app."
+  default     = "vanity"
 }
-variable "cidr" {
-  description = "cidr used for AWS VPC"
-  default     = "10.0.0.0/16"
-}
-variable "prefix" {
-  description = "prefix used for naming objects created in AWS"
-  default     = "my-volt-ubuntu-"
-}
+
 variable "uk_se_name" {
   description = "UK SE name tag"
   default     = "my-name"
@@ -35,18 +31,6 @@ variable "volterra_namespace" {
   type        = string
   description = "Volterra app namespace where the object will be created. This cannot be system or shared ns."
   default     = "my-namespace"
-}
-
-variable "site_name" {
-  type        = string
-  description = "Name of site to be created in Volterra and AWS"
-  default     = "my-site"
-}
-
-variable "ubuntu_domain" {
-  type        = string
-  description = "FQDN for the app. If you have delegated domain `prod.example.com`, then your app_domain can be `<app_name>.prod.example.com`"
-  default     = "ubuntu.emea-ent.f5demos.com"
 }
 
 variable "cloud_cred_name" {

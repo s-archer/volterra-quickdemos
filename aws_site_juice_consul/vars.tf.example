@@ -70,3 +70,15 @@ variable "volt_tenant" {
   description = "Volterra tenant name"
   default     = "my-tenant-abcde"
 }
+
+variable "volt_api_url" {
+  type        = string
+  description = "Volterra tenant api url"
+  default = "https://example.com/api"
+}
+
+variable "volt_api_p12_file" {
+  type        = string
+  description = "Volterra tenant api key"
+  default     = "../../location/api-creds.p12"
+}
