@@ -22,7 +22,7 @@ do
   if [[ $STATUS == *"200"* ]]; then
     echo "internet access check passed"
     break
-  elif [ $count -le 120 ]; then
+  elif [ $count -le 360 ]; then
     echo "Status code: $STATUS  Not done yet..."
     count=$[$count+1]
   else

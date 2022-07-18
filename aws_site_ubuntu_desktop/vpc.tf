@@ -42,6 +42,7 @@ resource "aws_subnet" "volterra_worker" {
   }
 }
 
+
 resource "aws_internet_gateway" "volt" {
   vpc_id = aws_vpc.volt.id
 
