@@ -43,6 +43,10 @@ variable "site_name" {
   default     = "my-site"
 }
 
+variable "base" {
+  default = "my-site"
+}
+
 variable "ubuntu_domain" {
   type        = string
   description = "FQDN for the app. If you have delegated domain `prod.example.com`, then your app_domain can be `<app_name>.prod.example.com`"

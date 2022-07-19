@@ -44,7 +44,11 @@ variable "volterra_namespace" {
 variable "site_name" {
   type        = string
   description = "Name of site to be created in Volterra and AWS"
-  default     = "my-site"
+  default     = "my-site.example.com"
+}
+
+variable "base" {
+  default = "my-site"
 }
 
 variable "app_domain" {

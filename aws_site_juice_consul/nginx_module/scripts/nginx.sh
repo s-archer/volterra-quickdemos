@@ -8,7 +8,7 @@ do
   if [[ $STATUS == *"200"* ]]; then
     echo "Got 200! NGINX is Ready!"
     break
-  elif [ $CNT -le 600 ]; then
+  elif [ $CNT -le 360 ]; then
     echo "Status code: $STATUS  Not done yet..."
     CNT=$[$CNT+1]
   else

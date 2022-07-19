@@ -1,3 +1,15 @@
+resource "volterra_app_firewall" "recommended" {
+  name      = "${var.uk_se_name}-waf-${var.short_name}"
+  namespace = var.volterra_namespace
+
+  allow_all_response_codes = true
+  default_anonymization = true
+  use_default_blocking_page = true
+  default_bot_setting = true
+  default_detection_settings = true
+  use_loadbalancer_setting = true
+}
+
 resource "volterra_healthcheck" "health" {
   name      = "${var.uk_se_name}-${var.short_name}"
   namespace = var.volterra_namespace
@@ -15,6 +27,7 @@ resource "volterra_origin_pool" "origin" {
   namespace              = var.volterra_namespace
   description            = "Terraform created origin pool"
   loadbalancer_algorithm = "LB_OVERRIDE"
+
   origin_servers {
     public_name {
       dns_name = var.origin_fqdn
@@ -46,9 +59,14 @@ resource "volterra_http_loadbalancer" "lb" {
   round_robin                     = true
   disable_rate_limit              = true
   no_service_policies             = true
-  disable_waf                     = true
   multi_lb_app                    = true
   user_id_client_ip               = true
+  #disable_waf                     = true
+
+  app_firewall {
+    name      = volterra_app_firewall.recommended.name
+    namespace = var.volterra_namespace
+  }
 
   https_auto_cert {
     add_hsts               = true
@@ -75,6 +93,17 @@ resource "volterra_http_loadbalancer" "lb" {
       http_method = "ANY"
       path {
         regex = "(.*?)"
+      }
+      origin_pools {
+        pool {
+          name      = volterra_origin_pool.origin.name
+          namespace = var.volterra_namespace
+        }
+        weight = 1
+      }
+      headers {
+        name = "Host"
+        exact = "adminae53.fnz.volterra.link"
       }
       host_rewrite = var.vanity_fqdn
     }

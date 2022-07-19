@@ -8,7 +8,7 @@ do
   if [[ $STATUS == *"200"* ]]; then
     echo "Got 200! Consul is Ready!"
     break
-  elif [ $CNT -le 120 ]; then
+  elif [ $CNT -le 360 ]; then
     echo "Status code: $STATUS  Not done yet..."
     CNT=$[$CNT+1]
   else

@@ -42,6 +42,59 @@ resource "aws_subnet" "volterra_worker" {
   }
 }
 
+resource "aws_subnet" "volterra_outside_1" {
+  cidr_block        = "10.0.111.0/24"
+  availability_zone = local.azs[1]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}outside_1"
+  }
+}
+
+resource "aws_subnet" "volterra_inside_1" {
+  cidr_block        = "10.0.112.0/24"
+  availability_zone = local.azs[1]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}inside_1"
+  }
+}
+
+resource "aws_subnet" "volterra_worker_1" {
+  cidr_block        = "10.0.113.0/24"
+  availability_zone = local.azs[1]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}worker_1"
+  }
+}
+
+resource "aws_subnet" "volterra_outside_2" {
+  cidr_block        = "10.0.121.0/24"
+  availability_zone = local.azs[2]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}outside_2"
+  }
+}
+
+resource "aws_subnet" "volterra_inside_2" {
+  cidr_block        = "10.0.122.0/24"
+  availability_zone = local.azs[2]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}inside_2"
+  }
+}
+
+resource "aws_subnet" "volterra_worker_2" {
+  cidr_block        = "10.0.123.0/24"
+  availability_zone = local.azs[2]
+  vpc_id            = aws_vpc.volt.id
+  tags = {
+    Name = "${var.prefix}worker_2"
+  }
+}
 
 resource "aws_internet_gateway" "volt" {
   vpc_id = aws_vpc.volt.id
