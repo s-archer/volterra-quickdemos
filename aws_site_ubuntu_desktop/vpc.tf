@@ -126,3 +126,23 @@ resource "aws_route_table_association" "volterra_inside" {
   subnet_id      = aws_subnet.volterra_inside.id
   route_table_id = aws_vpc.volt.default_route_table_id
 }
+
+resource "aws_route_table_association" "volterra_outside_1" {
+  subnet_id      = aws_subnet.volterra_outside_1.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}
+
+resource "aws_route_table_association" "volterra_inside_1" {
+  subnet_id      = aws_subnet.volterra_inside_1.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}
+
+resource "aws_route_table_association" "volterra_outside_2" {
+  subnet_id      = aws_subnet.volterra_outside_2.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}
+
+resource "aws_route_table_association" "volterra_inside_2" {
+  subnet_id      = aws_subnet.volterra_inside_2.id
+  route_table_id = aws_vpc.volt.default_route_table_id
+}

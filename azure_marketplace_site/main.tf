@@ -26,15 +26,28 @@ resource "azurerm_network_security_group" "vnet_sg" {
   resource_group_name = azurerm_resource_group.rg.name
 
   security_rule {
-    name                         = "allow F5XC documented domains out"
+    name                         = "allow HTTP, HTTPS inbound for LB"
     priority                     = 100
-    direction                    = "Outbound"
+    direction                    = "Inbound"
     access                       = "Allow"
     protocol                     = "Tcp"
     source_port_range            = "*"
-    destination_port_ranges      = ["80", "443"]
+    destination_port_range      = "*"
     source_address_prefix        = "*"
-    destination_address_prefixes = local.cidrs
+    # destination_address_prefixes = local.cidrs
+    destination_address_prefix   = "*"
+  }
+
+  security_rule {
+    name                         = "allow F5XC documented IPSEC in"
+    priority                     = 102
+    direction                    = "Inbound"
+    access                       = "Allow"
+    protocol                     = "Udp"
+    source_port_range            = "*"
+    destination_port_range       = "*"
+    source_address_prefix        = "*"
+    destination_address_prefix   = "*"
   }
 
   security_rule {
@@ -44,9 +57,9 @@ resource "azurerm_network_security_group" "vnet_sg" {
     access                       = "Allow"
     protocol                     = "Tcp"
     source_port_range            = "*"
-    destination_port_ranges      = ["80", "443"]
+    destination_port_range      = "*"
     source_address_prefix        = "*"
-    destination_address_prefixes = ["5.182.213.0/25", "5.182.212.0/25", "5.182.213.128/25", "5.182.214.0/25", "20.150.0.0/16", "34.0.0.0/8", "44.196.0.0/16", "51.140.0.0/15", "52.0.0.0/8", "54.0.0.0/8", "64.0.0.0/8", "74.0.0.0/8", "81.21.0.0/16", "83.151.0.0/16", "84.54.60.0/25", "85.199.0.0/16", "90.155.0.0/16", "104.18.0.0/16", "108.0.0.0/7", "129.250.0.0/16", "162.159.0.0/16", "172.0.0.0/6", "185.0.0.0/16", "192.33.0.0/16", "208.67.0.0/16", "209.51.0.0/16", "216.0.0.0/6"]
+    destination_address_prefix   = "*"
   }
 
   security_rule {
@@ -56,9 +69,9 @@ resource "azurerm_network_security_group" "vnet_sg" {
     access                       = "Allow"
     protocol                     = "Udp"
     source_port_range            = "*"
-    destination_port_range       = "4500"
+    destination_port_range       = "*"
     source_address_prefix        = "*"
-    destination_address_prefixes = ["5.182.213.0/25", "5.182.212.0/25", "5.182.213.128/25", "5.182.214.0/25", "84.54.60.0/25", "185.56.154.0/25"]
+    destination_address_prefix   = "*"
   }
 
   security_rule {

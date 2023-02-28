@@ -35,57 +35,57 @@ resource "volterra_aws_vpc_site" "site" {
 
       //Site local outside subnet
       outside_subnet {
-        existing_subnet_id = aws_subnet.volterra_outside.id
+        existing_subnet_id = aws_subnet.eks_outside.id
       }
 
       //Site local inside subnet
       inside_subnet {
-        existing_subnet_id = aws_subnet.volterra_inside.id
+        existing_subnet_id = aws_subnet.eks_inside.id
       }
 
       //Workload subnet
       workload_subnet {
-        existing_subnet_id = aws_subnet.volterra_worker.id
+        existing_subnet_id = aws_subnet.eks_worker.id
       }
     }
-    az_nodes {
-      //AWS AZ
-      aws_az_name = format("%sb", var.region)
+    # az_nodes {
+    #   //AWS AZ
+    #   aws_az_name = format("%sb", var.region)
 
-      //Site local outside subnet
-      outside_subnet {
-        existing_subnet_id = aws_subnet.volterra_outside_1.id
-      }
+    #   //Site local outside subnet
+    #   outside_subnet {
+    #     existing_subnet_id = aws_subnet.eks_outside_1.id
+    #   }
 
-      //Site local inside subnet
-      inside_subnet {
-        existing_subnet_id = aws_subnet.volterra_inside_1.id
-      }
+    #   //Site local inside subnet
+    #   inside_subnet {
+    #     existing_subnet_id = aws_subnet.eks_inside_1.id
+    #   }
 
-      //Workload subnet
-      workload_subnet {
-        existing_subnet_id = aws_subnet.volterra_worker_1.id
-      }
-    }
-    az_nodes {
-      //AWS AZ
-      aws_az_name = format("%sc", var.region)
+    #   //Workload subnet
+    #   workload_subnet {
+    #     existing_subnet_id = aws_subnet.eks_worker_1.id
+    #   }
+    # }
+    # az_nodes {
+    #   //AWS AZ
+    #   aws_az_name = format("%sc", var.region)
 
-      //Site local outside subnet
-      outside_subnet {
-        existing_subnet_id = aws_subnet.volterra_outside_2.id
-      }
+    #   //Site local outside subnet
+    #   outside_subnet {
+    #     existing_subnet_id = aws_subnet.eks_outside_2.id
+    #   }
 
-      //Site local inside subnet
-      inside_subnet {
-        existing_subnet_id = aws_subnet.volterra_inside_2.id
-      }
+    #   //Site local inside subnet
+    #   inside_subnet {
+    #     existing_subnet_id = aws_subnet.eks_inside_2.id
+    #   }
 
-      //Workload subnet
-      workload_subnet {
-        existing_subnet_id = aws_subnet.volterra_worker_2.id
-      }
-    }
+    #   //Workload subnet
+    #   workload_subnet {
+    #     existing_subnet_id = aws_subnet.eks_worker_2.id
+    #   }
+    # }
   }
 
   //Mandatory
@@ -139,24 +139,5 @@ resource "volterra_tf_params_action" "site" {
         x=$(( $x + 1 )); 
       done
     EOF
-  }
-}
-
-data "aws_network_interface" "dns-ip" {
-
-  depends_on = [
-    volterra_tf_params_action.site
-  ]
-  filter {
-    name   = "tag:ves-io-site-name" 
-    values = [var.site_name]
-  }
-  filter {  
-    name   = "tag:ves.io/interface-type"
-    values = ["site-local-inside"]
-  }
-  filter {  
-    name   = "tag:ves-io-eni-az"
-    values = ["eu-west-1a"]
   }
 }

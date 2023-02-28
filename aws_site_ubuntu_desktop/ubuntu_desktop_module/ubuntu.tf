@@ -9,7 +9,8 @@ data "aws_ami" "ubuntu" {
 }
 
 resource "aws_instance" "ubuntu" {
-  ami                         = data.aws_ami.ubuntu.id
+  #ami                         = data.aws_ami.ubuntu.id
+  ami                         = "ami-09f9978f467778b47"
   instance_type               = "t2.medium"
   private_ip                  = "10.0.103.100"
   subnet_id                   = var.subnet
@@ -26,12 +27,13 @@ resource "aws_instance" "ubuntu" {
 }
 
 data "aws_instances" "ubuntu" {
-  depends_on = [
-    aws_instance.ubuntu
-  ]
+  # depends_on = [
+  #   aws_instance.ubuntu
+  # ]
 
   instance_tags = {
-    Name  = "${var.prefix}-ubuntu"
+    #Name  = "${var.prefix}-ubuntu"
+    Name  = aws_instance.ubuntu.tags_all["Name"]
     Env   = "ubuntu"
     UK-SE = var.uk_se
   }
