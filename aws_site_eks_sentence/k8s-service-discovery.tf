@@ -1,3 +1,7 @@
+#  The next several resources and data sources create the kubeconfig file with Service Account credentials.
+#  The workflow is based on Michael O'Leary's excellent article https://community.f5.com/t5/technical-articles/using-a-kubernetes-serviceaccount-for-service-discovery-with-f5/ta-p/300225
+
+
 resource "kubernetes_service_account_v1" "f5xc-xxx" {
   metadata {
     name      = "f5xc-xxx"
