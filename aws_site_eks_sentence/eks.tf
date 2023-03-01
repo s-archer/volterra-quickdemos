@@ -12,6 +12,20 @@ resource "aws_eks_cluster" "arch-eks" {
     aws_iam_role_policy_attachment.arch-eks-cluster-attach-0,
     aws_iam_role_policy_attachment.arch-eks-cluster-attach-1,
   ]
+  tags = {
+    Name  = "${var.prefix}-cluster"
+    owner = var.uk_se_name
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "eks-in" {
+  security_group_id = aws_eks_cluster.arch-eks.vpc_config[0].cluster_security_group_id
+
+  cidr_ipv4 = "10.0.0.0/16"
+  # from_port   = 0
+  ip_protocol = "-1"
+  # to_port     = 0
+  description = "allow any inbound to cluster"
 }
 
 resource "aws_eks_node_group" "arch-eks-nodes" {
@@ -20,7 +34,7 @@ resource "aws_eks_node_group" "arch-eks-nodes" {
   version         = aws_eks_cluster.arch-eks.version
   release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
   node_role_arn   = aws_iam_role.arch-eks-node-role.arn
-  subnet_ids      = [aws_subnet.eks_data.id, aws_subnet.eks_data_1.id, aws_subnet.eks_data_2.id]
+  subnet_ids      = [aws_subnet.eks_worker.id, aws_subnet.eks_worker_1.id, aws_subnet.eks_worker_2.id]
 
   scaling_config {
     desired_size = 1
@@ -39,6 +53,10 @@ resource "aws_eks_node_group" "arch-eks-nodes" {
     aws_iam_role_policy_attachment.arch-eks-node-attach-1,
     aws_iam_role_policy_attachment.arch-eks-node-attach-2,
   ]
+  tags = {
+    Name  = "${var.prefix}-nodes"
+    owner = var.uk_se_name
+  }
 }
 
 resource "aws_iam_role" "eks-cluster-role" {
@@ -87,17 +105,17 @@ resource "aws_iam_role" "arch-eks-node-role" {
 }
 
 resource "aws_iam_role_policy_attachment" "arch-eks-node-attach-0" {
-  role      = aws_iam_role.arch-eks-node-role.name
+  role       = aws_iam_role.arch-eks-node-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
 }
 
 resource "aws_iam_role_policy_attachment" "arch-eks-node-attach-1" {
-  role      = aws_iam_role.arch-eks-node-role.name
+  role       = aws_iam_role.arch-eks-node-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
 resource "aws_iam_role_policy_attachment" "arch-eks-node-attach-2" {
-  role      = aws_iam_role.arch-eks-node-role.name
+  role       = aws_iam_role.arch-eks-node-role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
 }
 

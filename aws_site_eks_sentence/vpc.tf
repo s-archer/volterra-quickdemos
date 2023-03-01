@@ -30,29 +30,30 @@ resource "aws_subnet" "eks_inside" {
 }
 
 resource "aws_subnet" "eks_worker" {
-  cidr_block        = "10.0.103.0/24"
-  availability_zone = local.azs[0]
-  vpc_id            = aws_vpc.volt.id
+  cidr_block              = "10.0.103.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = local.azs[0]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}worker"
   }
 }
 
 resource "aws_subnet" "eks_control" {
-  cidr_block        = "10.0.104.0/24"
+  cidr_block              = "10.0.104.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[0]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[0]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}control"
   }
 }
 
 resource "aws_subnet" "eks_data" {
-  cidr_block        = "10.0.105.0/24"
+  cidr_block              = "10.0.105.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[0]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[0]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}data"
   }
@@ -77,29 +78,30 @@ resource "aws_subnet" "eks_inside_1" {
 }
 
 resource "aws_subnet" "eks_worker_1" {
-  cidr_block        = "10.0.113.0/24"
-  availability_zone = local.azs[1]
-  vpc_id            = aws_vpc.volt.id
+  cidr_block              = "10.0.113.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = local.azs[1]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}worker_1"
   }
 }
 
 resource "aws_subnet" "eks_control_1" {
-  cidr_block        = "10.0.114.0/24"
+  cidr_block              = "10.0.114.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[1]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[1]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}control_1"
   }
 }
 
 resource "aws_subnet" "eks_data_1" {
-  cidr_block        = "10.0.115.0/24"
+  cidr_block              = "10.0.115.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[1]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[1]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}data_1"
   }
@@ -124,29 +126,30 @@ resource "aws_subnet" "eks_inside_2" {
 }
 
 resource "aws_subnet" "eks_worker_2" {
-  cidr_block        = "10.0.123.0/24"
-  availability_zone = local.azs[2]
-  vpc_id            = aws_vpc.volt.id
+  cidr_block              = "10.0.123.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = local.azs[2]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}worker_2"
   }
 }
 
 resource "aws_subnet" "eks_control_2" {
-  cidr_block        = "10.0.124.0/24"
+  cidr_block              = "10.0.124.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[2]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[2]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}control_2"
   }
 }
 
 resource "aws_subnet" "eks_data_2" {
-  cidr_block        = "10.0.125.0/24"
+  cidr_block              = "10.0.125.0/24"
   map_public_ip_on_launch = true
-  availability_zone = local.azs[2]
-  vpc_id            = aws_vpc.volt.id
+  availability_zone       = local.azs[2]
+  vpc_id                  = aws_vpc.volt.id
   tags = {
     Name = "${var.prefix}data_2"
   }

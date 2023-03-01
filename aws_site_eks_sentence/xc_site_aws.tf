@@ -18,12 +18,16 @@ resource "volterra_aws_vpc_site" "site" {
   }
 
   ingress_egress_gw {
-    aws_certified_hw         = "aws-byol-multi-nic-voltmesh"
+    aws_certified_hw = "aws-byol-multi-nic-voltmesh"
     # no_forward_proxy         = false
-    no_forward_proxy         = true
+    no_forward_proxy = true
     # forward_proxy_allow_all  = true
-    no_global_network        = true
-    no_inside_static_routes  = true
+    no_global_network = true
+    inside_static_routes {
+      static_route_list {
+        simple_static_route = "10.0.0.0/16"
+      }
+    }
     no_outside_static_routes = true
     no_network_policy        = true
 
@@ -141,3 +145,38 @@ resource "volterra_tf_params_action" "site" {
     EOF
   }
 }
+
+
+# resource "volterra_discovery" "k8s" {
+#   name      = "${var.prefix}k8s"
+#   namespace = "system"
+
+
+#   discovery_k8s {
+#     access_info {
+#       // One of the arguments from this list "kubeconfig_url connection_info in_cluster" must be set
+
+#       kubeconfig_url {
+
+#       }
+
+#       // One of the arguments from this list "isolated reachable" must be set
+#       isolated = true
+#     }
+
+#     publish_info {
+#       // One of the arguments from this list "disable publish publish_fqdns dns_delegation" must be set
+#       disable = true
+#     }
+#   }
+#   where {
+#     site {
+#       network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
+#       ref {
+#         name      = volterra_aws_vpc_site.site.name
+#         namespace = volterra_aws_vpc_site.site.namespace
+#         tenant    = var.volt_tenant
+#       }
+#     }
+#   }
+# }

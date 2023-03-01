@@ -74,3 +74,7 @@ variable "volt_api_p12_file" {
   description = "Volterra tenant api key"
   default     = "../path/to/api-creds.p12"
 }
+
+variable "sa_name" {
+  default = "f5xc"
+}
