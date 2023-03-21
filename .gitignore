@@ -1,11 +1,17 @@
 # Other files including my vars file.  vars.tf.example will be allowed.
+rendered_kubeconfig.yaml
+**/rendered_kubeconfig.yaml
+*.secret
 *.pem
 /*/vars.tf
 /vars.tf
+vars.tf
 # Local .terraform directories
 **/.terraform/*
-/.DS_Store
-/*/.DS_Store
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
 
 # .tfstate files
 *.tfstate
