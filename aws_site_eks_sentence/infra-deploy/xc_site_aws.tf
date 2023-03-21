@@ -10,7 +10,7 @@ resource "volterra_aws_vpc_site" "site" {
   aws_cred {
     name      = var.cloud_cred_name
     namespace = "system"
-    tenant    = var.volt_tenant
+    # tenant    = var.volt_tenant
   }
 
   vpc {
@@ -109,13 +109,25 @@ resource "volterra_api_credential" "api" {
   name                = format("%s-%s-api-token", var.uk_se_name, var.base)
   api_credential_type = "API_TOKEN"
 
+  # provisioner "local-exec" {
+  #   when    = destroy
+  #   command = <<-EOF
+  #     #!/bin/bash
+  #     NAME=$(curl --location --request GET 'https://f5-emea-ent.console.ves.volterra.io/api/web/namespaces/system/api_credentials' \
+  #       --header 'Authorization: APIToken ${self.data}'| jq 'first(.items[] | select (.name | contains("${self.name}")) | .name)') 
+  #     curl --location --request POST 'https://f5-emea-ent.console.ves.volterra.io/api/web/namespaces/system/revoke/api_credentials' \
+  #       --header 'Authorization: APIToken ${self.data}' \
+  #       --header 'Content-Type: application/json' \
+  #       -d "$(jq -n --arg n "$NAME" '{"name": $n, "namespace": "system" }')"
+  #   EOF
+  # }
   provisioner "local-exec" {
     when    = destroy
     command = <<-EOF
       #!/bin/bash
-      NAME=$(curl --location --request GET 'https://f5-emea-ent.console.ves.volterra.io/api/web/namespaces/system/api_credentials' \
+      NAME=$(curl --location --request GET 'https://f5-spda-emea.console.ves.volterra.io/api/web/namespaces/system/api_credentials' \
         --header 'Authorization: APIToken ${self.data}'| jq 'first(.items[] | select (.name | contains("${self.name}")) | .name)') 
-      curl --location --request POST 'https://f5-emea-ent.console.ves.volterra.io/api/web/namespaces/system/revoke/api_credentials' \
+      curl --location --request POST 'https://f5-spda-emea.console.ves.volterra.io/api/web/namespaces/system/revoke/api_credentials' \
         --header 'Authorization: APIToken ${self.data}' \
         --header 'Content-Type: application/json' \
         -d "$(jq -n --arg n "$NAME" '{"name": $n, "namespace": "system" }')"
@@ -145,38 +157,3 @@ resource "volterra_tf_params_action" "site" {
     EOF
   }
 }
-
-
-# resource "volterra_discovery" "k8s" {
-#   name      = "${var.prefix}k8s"
-#   namespace = "system"
-
-
-#   discovery_k8s {
-#     access_info {
-#       // One of the arguments from this list "kubeconfig_url connection_info in_cluster" must be set
-
-#       kubeconfig_url {
-
-#       }
-
-#       // One of the arguments from this list "isolated reachable" must be set
-#       isolated = true
-#     }
-
-#     publish_info {
-#       // One of the arguments from this list "disable publish publish_fqdns dns_delegation" must be set
-#       disable = true
-#     }
-#   }
-#   where {
-#     site {
-#       network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
-#       ref {
-#         name      = volterra_aws_vpc_site.site.name
-#         namespace = volterra_aws_vpc_site.site.namespace
-#         tenant    = var.volt_tenant
-#       }
-#     }
-#   }
-# }

@@ -6,5 +6,4 @@ resource "helm_release" "sentence-app" {
   values = [
     "${file("values.yaml")}"
   ]
-
 }

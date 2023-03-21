@@ -1,6 +1,6 @@
 ## Deploy EKS, XC CE and then Helm for Sentence App
 
-To create the AWS environment (VPC, subnest and AKS cluster (single node)) and the XC CE site:
+To create the AWS environment (VPC, subnest and EKS cluster (single node)) and the XC CE site:
 
 - Modify vars.tf.example and rename to vars.tf
 
@@ -16,6 +16,7 @@ To deploy Sentence App using helm:
 
 - terraform apply
 
+To get the kubeconfig.yaml for EKS, 
 
 For Volterra cert auth .p12. need to:
 

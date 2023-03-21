@@ -10,17 +10,17 @@ global:
   sitename: My-Site
 
 adjectives: 
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: ClusterIP
 
 animals:
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: ClusterIP
 
 backgrounds:
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: ClusterIP
 
@@ -30,16 +30,16 @@ colors:
   serviceType: ClusterIP
 
 frontend:
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: NodePort
 
 generator:
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: ClusterIP
 
 locations:
-  enabled: true
+  enabled: false
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
   serviceType: ClusterIP

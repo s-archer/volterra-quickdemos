@@ -22,9 +22,7 @@ resource "aws_vpc_security_group_ingress_rule" "eks-in" {
   security_group_id = aws_eks_cluster.arch-eks.vpc_config[0].cluster_security_group_id
 
   cidr_ipv4 = "10.0.0.0/16"
-  # from_port   = 0
   ip_protocol = "-1"
-  # to_port     = 0
   description = "allow any inbound to cluster"
 }
 

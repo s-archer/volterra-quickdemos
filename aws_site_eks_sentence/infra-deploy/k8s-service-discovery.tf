@@ -22,6 +22,9 @@ resource "kubernetes_secret_v1" "f5xc-secret-xxx" {
 }
 
 data "kubernetes_secret_v1" "f5xc-secret-xxx" {
+  depends_on = [
+    aws_eks_node_group.arch-eks-nodes
+  ]
   metadata {
     name      = "f5xc-secret-xxx"
     namespace = "kube-system"
@@ -68,7 +71,8 @@ resource "local_file" "rendered_kubeconfig" {
 }
 
 resource "volterra_discovery" "k8s" {
-  name      = "${var.prefix}k8s"
+  # name      = "${var.prefix}k8s"
+  name       = "aws-sentence"
   namespace = "system"
 
   discovery_k8s {
@@ -101,7 +105,7 @@ resource "volterra_discovery" "k8s" {
       ref {
         name      = volterra_aws_vpc_site.site.name
         namespace = volterra_aws_vpc_site.site.namespace
-        tenant    = var.volt_tenant
+        # tenant    = var.volt_tenant
       }
     }
   }
