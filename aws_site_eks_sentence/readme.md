@@ -2,7 +2,13 @@
 
 To create the AWS environment (VPC, subnest and EKS cluster (single node)) and the XC CE site:
 
-- Modify vars.tf.example and rename to vars.tf
+- login to XC and create and download a .p12 API Certificate and specifiy a passphrase
+
+- on the CLI issue the command `export VES_P12_PASSWORD=<cert passphrase>` using the passphrase created in the previous step
+
+- Rename `vars.tf.example` to `vars.tf` and update (make sure point relevant var to the location of your .p12 API Certificate file) 
+
+- cd ./infra-deploy
 
 - terraform init
 
@@ -10,14 +16,17 @@ To create the AWS environment (VPC, subnest and EKS cluster (single node)) and t
 
 To deploy Sentence App using helm:
 
-- cd ./helm
+- cd ../helm
 
 - terraform init
 
 - terraform apply
 
-To get the kubeconfig.yaml for EKS, 
 
-For Volterra cert auth .p12. need to:
+To deploy Sentence App LB & Origin:
 
-	export VES_P12_PASSWORD=<cert passphrase>
+- cd ../lb-and-origin
+
+- terraform init
+
+- terraform apply
