@@ -1,0 +1,8 @@
+http://sentence.local/api/backgrounds/5
+http://sentence.local/api/sentence
+http://sentence.local/css/style.css
+http://sentence.local/favicon.ico
+http://sentence.local/images/f5.png
+http://sentence.local/images/nginx.png
+http://sentence.local/js/anime.min.js
+http://sentence.local/js/script.js

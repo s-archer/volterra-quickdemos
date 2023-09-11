@@ -72,10 +72,10 @@ resource "volterra_http_loadbalancer" "consul-tf" {
   user_id_client_ip               = true
 
   https_auto_cert {
-    add_hsts       = false
-    http_redirect  = true
-    no_mtls        = true
-    default_header = true
+    add_hsts              = false
+    http_redirect         = true
+    no_mtls               = true
+    default_header        = true
     enable_path_normalize = true
 
     tls_config {

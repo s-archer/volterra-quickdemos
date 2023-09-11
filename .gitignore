@@ -3,9 +3,15 @@ rendered_kubeconfig.yaml
 **/rendered_kubeconfig.yaml
 *.secret
 *.pem
-/*/vars.tf
-/vars.tf
+*.key
 vars.tf
+/vars.tf
+/*/vars.tf
+kube_config.yaml
+/kube_config.yaml
+/*/kube_config.yaml
+tmp/
+temp/
 # Local .terraform directories
 **/.terraform/*
 .DS_Store

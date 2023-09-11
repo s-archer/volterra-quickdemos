@@ -1,0 +1,56 @@
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "my@email.com"
+}
+
+variable "xc_namespace" {
+  type        = string
+  description = "Volterra app namespace where the object will be created. This cannot be system or shared ns."
+  default     = "my-namespace"
+}
+
+variable "site_name" {
+  type        = string
+  description = "Name of site to be created in Volterra and AWS"
+  default     = "my-site"
+}
+
+variable "base" {
+  default = "vk8s"
+}
+
+variable "xc_tenant" {
+  type        = string
+  description = "Volterra tenant name"
+  default     = "my-tenant"
+}
+
+variable "xc_api_url" {
+  type        = string
+  description = "Volterra tenant api url"
+  default     = "https://my-tenant..."
+}
+
+variable "xc_api_p12_file" {
+  type        = string
+  description = "Volterra tenant api key"
+  default     = "../creds/api-creds.p12"
+}
+
+variable "xc_vk8s_name" {
+  type        = string
+  description = "Volterra vk8s name"
+  default     = "my-vk8s"
+}
+
+variable "xc_vk8s_virtual_site_name" {
+  type        = string
+  description = "Volterra vk8s site name"
+  default     = "my-virtual-site"
+}
+
+variable "xc_vk8s_virtual_site_namespace" {
+  type        = string
+  description = "Volterra vk8s site namespace"
+  default     = "shared"
+}

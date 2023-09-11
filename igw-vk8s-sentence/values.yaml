@@ -1,0 +1,54 @@
+# Set the namespace for the deplyment at the global level to propagate to the child charts.
+namespace: {}
+
+global:
+  namespace: "${ namespace }"
+  createNamespace: false
+  prefix: sentence
+  registry: registry.gitlab.com/sentence-app/
+  registryTag: latest
+  message: "namespace=${ namespace }"
+  siteenv: siteenv
+  sitename: vk8s-igw-site
+
+adjectives: 
+  enabled: true
+  registryTag: v1
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+animals:
+  enabled: true
+  registryTag: v1
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+backgrounds:
+  enabled: true
+  registryTag: v1
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+colors:
+  enabled: false
+  registryTag: v1
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+frontend:
+  enabled: true
+  registryTag: v3
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+generator:
+  enabled: true
+  registryTag: v3
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP
+
+locations:
+  enabled: true
+  registryTag: v1
+  # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
+  serviceType: ClusterIP

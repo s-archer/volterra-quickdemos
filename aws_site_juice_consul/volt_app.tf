@@ -43,8 +43,8 @@ resource "volterra_origin_pool" "juice-tf" {
   endpoint_selection = "LOCAL_PREFERRED"
   no_tls             = true
   healthcheck {
-      name      = volterra_healthcheck.juice-tf.name
-      namespace = var.volterra_namespace
+    name      = volterra_healthcheck.juice-tf.name
+    namespace = var.volterra_namespace
   }
 }
 
@@ -59,15 +59,15 @@ resource "volterra_http_loadbalancer" "juice-tf" {
   disable_rate_limit              = true
   no_service_policies             = true
   # disable_waf                     = true
-  multi_lb_app                    = true
-  user_id_client_ip               = true
+  multi_lb_app      = true
+  user_id_client_ip = true
 
   https_auto_cert {
-    add_hsts               = false
-    http_redirect          = true
-    no_mtls                = true
-    default_header         = true
-    enable_path_normalize  = true
+    add_hsts              = false
+    http_redirect         = true
+    no_mtls               = true
+    default_header        = true
+    enable_path_normalize = true
 
     tls_config {
       default_security = true
@@ -145,5 +145,5 @@ resource "volterra_app_firewall" "example" {
   default_detection_settings = true
 
   // One of the arguments from this list "use_loadbalancer_setting blocking monitoring" must be set
-  use_loadbalancer_setting = true
+  blocking = true
 }
