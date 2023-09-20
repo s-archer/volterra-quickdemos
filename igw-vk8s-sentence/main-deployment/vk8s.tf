@@ -7,14 +7,14 @@ resource "volterra_virtual_k8s" "vk8s" {
     namespace = var.xc_vk8s_virtual_site_namespace
   }
 
-  provisioner "local-exec" {
-    command     = "${path.module}/f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
-    working_dir = "${path.module}/tmp"    
-    environment = {
-      VES_API_URL = var.xc_api_url
-      VES_P12     = var.xc_api_p12_file
-    }
-  }
+  # provisioner "local-exec" {
+  #   command     = "${path.module}/f5xc_resource_ready.py --type vk8s --name ${self.name} --ns ${self.namespace}"
+  #   working_dir = "${path.module}/tmp"    
+  #   environment = {
+  #     VES_API_URL = var.xc_api_url
+  #     VES_P12     = var.xc_api_p12_file
+  #   }
+  # }
 }
 
 resource "volterra_api_credential" "vk8s" {

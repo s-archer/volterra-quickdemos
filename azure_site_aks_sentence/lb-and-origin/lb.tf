@@ -21,7 +21,7 @@ resource "volterra_http_loadbalancer" "sentence-frontend" {
 
   app_firewall {
     namespace = "shared"
-    name      = "default"
+    name      = "arch-shared-waf"
   }
 
   default_route_pools {

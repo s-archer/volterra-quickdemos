@@ -3,7 +3,7 @@ resource "helm_release" "sentence-app" {
   name       = "sentence-app"
   repository = "https://gitlab.com/api/v4/projects/31458926/packages/helm/main"
   chart      = "sentence-app"
-  version    = "0.5.0"
+  version    = "0.6.0"
   wait       = false
 
   values = [

@@ -3,7 +3,7 @@ resource "volterra_http_loadbalancer" "sentence-vk8s" {
   namespace   = var.xc_namespace
   description = "Internal LB for vk8s sentence app"
   domains     = ["sentence.local"]
-  labels      = { "ves.io/app_type" : volterra_app_type.sentence-ai.name }
+  labels      = { "ves.io/app_type" : "arch-demo-all-features" }
 
   http {
     dns_volterra_managed = false
@@ -56,22 +56,22 @@ resource "volterra_origin_pool" "sentence-vk8s" {
   }
 }
 
-resource "volterra_app_type" "sentence-ai" {
-  name      = "arch-sentence-api"
-  namespace = "shared"
-  features {
-    type = "BUSINESS_LOGIC_MARKUP"
-  }
-  features {
-    type = "USER_BEHAVIOR_ANALYSIS"
-  }
-  features {
-    type = "PER_REQ_ANOMALY_DETECTION"
-  }
-  features {
-    type = "TIMESERIES_ANOMALY_DETECTION"
-  }
-  business_logic_markup_setting {
-    enable = true
-  }
-}
+# resource "volterra_app_type" "sentence-ai" {
+#   name      = "arch-sentence-api"
+#   namespace = "shared"
+#   features {
+#     type = "BUSINESS_LOGIC_MARKUP"
+#   }
+#   features {
+#     type = "USER_BEHAVIOR_ANALYSIS"
+#   }
+#   features {
+#     type = "PER_REQ_ANOMALY_DETECTION"
+#   }
+#   features {
+#     type = "TIMESERIES_ANOMALY_DETECTION"
+#   }
+#   business_logic_markup_setting {
+#     enable = true
+#   }
+# }

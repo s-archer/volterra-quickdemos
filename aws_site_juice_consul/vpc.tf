@@ -53,12 +53,12 @@ resource "aws_default_route_table" "default" {
   }
 }
 
-resource "aws_route_table_association" "volterra_outside" {
-  subnet_id      = aws_subnet.volterra_outside.id
-  route_table_id = aws_vpc.volt.default_route_table_id
-}
+# resource "aws_route_table_association" "volterra_outside" {
+#   subnet_id      = aws_subnet.volterra_outside.id
+#   route_table_id = aws_vpc.volt.default_route_table_id
+# }
 
-resource "aws_route_table_association" "volterra_inside" {
-  subnet_id      = aws_subnet.volterra_inside.id
-  route_table_id = aws_vpc.volt.default_route_table_id
-}
+# resource "aws_route_table_association" "volterra_inside" {
+#   subnet_id      = aws_subnet.volterra_inside.id
+#   route_table_id = aws_vpc.volt.default_route_table_id
+# }
