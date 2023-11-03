@@ -110,7 +110,7 @@ resource "kubernetes_cluster_role_binding" "f5xc-service-discovery" {
 }
 
 resource "local_file" "rendered_kubeconfig" {
-  content = templatefile("${path.module}/k8s-templates/kubeconfig.tpl", {
+  content = templatefile("${path.module}/k8s-templates/kube_config.tpl", {
     cluster_name = aws_eks_cluster.eks.arn
     ca_crt       = base64encode("${data.kubernetes_secret_v1.f5xc-secret.data["ca.crt"]}")
     server       = aws_eks_cluster.eks.endpoint

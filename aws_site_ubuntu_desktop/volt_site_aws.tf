@@ -3,8 +3,9 @@ resource "volterra_aws_vpc_site" "site" {
   namespace  = "system"
   aws_region = var.region
 
-  assisted      = false
+  # assisted      = false
   instance_type = "t3.xlarge"
+  ssh_key = trimspace(tls_private_key.demo.public_key_openssh)
 
   //AWS credentials entered in the Volterra Console
   aws_cred {
