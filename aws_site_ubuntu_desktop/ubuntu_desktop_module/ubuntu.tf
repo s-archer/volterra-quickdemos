@@ -1,12 +1,15 @@
-data "aws_ami" "ubuntu" {
-  most_recent = true
+# data "aws_ami" "ubuntu" {
+#   most_recent = true
 
-  filter {
-    name   = "name"
-    values = ["netcubed/amd64/ubuntu-desktop-20.04*"]
-  }
-  owners = ["679593333241"] # netcubed
-}
+#   filter {
+#     name   = "name"
+#     values = ["netcubed/amd64/ubuntu-desktop-20.04*"]
+#   }
+#   owners = ["679593333241"] # netcubed
+# }
+
+# Note that I have commented out above because AWS no longer returns images older than two years using the AMI API.check "
+# Had to hard-code the AMI for the eu-west-1 region below.
 
 resource "aws_instance" "ubuntu" {
   #ami                         = data.aws_ami.ubuntu.id

@@ -1,5 +1,5 @@
 resource "volterra_discovery" "consul" {
-  name      = "consul"
+  name      = "arch-consul"
   namespace = "system"
 
   // One of the arguments from this list "discovery_k8s discovery_consul" must be set

@@ -19,7 +19,7 @@ provider "volterra" {
 provider "aws" {
   region                  = var.region
   shared_credentials_file = "~/.aws/credentials"
-  profile                 = "Default"
+  profile                 = "default"
   default_tags {
     tags = {
       UK-SE = var.uk_se_name

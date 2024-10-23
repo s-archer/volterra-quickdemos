@@ -1,0 +1,23 @@
+variable "volt_api_url" {
+  type        = string
+  description = "Volterra tenant api url"
+  default = "https://tenant.console.ves.volterra.io/api"
+}
+
+variable "volt_api_p12_file" {
+  type        = string
+  description = "Volterra tenant api key"
+  default     = "../path/to/api-creds.p12"
+}
+
+variable "volterra_namespace" {
+  type        = string
+  description = "Volterra namespace where the LB and Origin will be created. This cannot be system or shared ns."
+  default     = "my-namespace"
+}
+
+variable "lb_domain" {
+  type        = string
+  description = "FQDN for the Load-Balancer"
+  default     = "sentence.sub.domain.com"
+}

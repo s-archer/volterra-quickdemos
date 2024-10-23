@@ -32,15 +32,7 @@ resource "azurerm_private_dns_resolver_forwarding_rule" "dns-xc-out" {
     port       = 53
   }
 
-  target_dns_servers {
-    ip_address = data.azurerm_network_interface.master-1-sli.private_ip_address
-    port       = 53
-  }
 
-  target_dns_servers {
-    ip_address = data.azurerm_network_interface.master-2-sli.private_ip_address
-    port       = 53
-  }
 }
 
 resource "azurerm_private_dns_resolver_virtual_network_link" "dns-xc-out-link" {
@@ -55,14 +47,14 @@ data "azurerm_network_interface" "master-0-sli" {
   depends_on          = [volterra_tf_params_action.site]
 }
 
-data "azurerm_network_interface" "master-1-sli" {
-  name                = "master-1-sli"
-  resource_group_name = format("%srg-%s", var.prefix, "xc")
-  depends_on          = [volterra_tf_params_action.site]
-}
+# data "azurerm_network_interface" "master-1-sli" {
+#   name                = "master-1-sli"
+#   resource_group_name = format("%srg-%s", var.prefix, "xc")
+#   depends_on          = [volterra_tf_params_action.site]
+# }
 
-data "azurerm_network_interface" "master-2-sli" {
-  name                = "master-2-sli"
-  resource_group_name = format("%srg-%s", var.prefix, "xc")
-  depends_on          = [volterra_tf_params_action.site]
-}
+# data "azurerm_network_interface" "master-2-sli" {
+#   name                = "master-2-sli"
+#   resource_group_name = format("%srg-%s", var.prefix, "xc")
+#   depends_on          = [volterra_tf_params_action.site]
+# }

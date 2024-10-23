@@ -94,11 +94,29 @@ resource "volterra_aws_vpc_site" "site" {
 
   //Mandatory
   no_worker_nodes = true
+
+  lifecycle {
+    ignore_changes = [labels]
+  }
 }
 
 resource "null_resource" "wait-for-site" {
   triggers = {
     depends = volterra_aws_vpc_site.site.id
+  }
+  provisioner "local-exec" {
+    command = <<-EOF
+      #!/bin/bash
+      x=1;
+      while [ $x -le 60 ]; 
+        do VALIDATION_STATE=$(curl -s --location --request GET '${var.volt_api_url}/config/namespaces/system/aws_vpc_sites/${var.site_name}' --header 'Authorization: APIToken ${volterra_api_credential.api.data}'| jq .spec.validation_state); 
+        if ( echo $VALIDATION_STATE | grep "VALIDATION_SUCCEEDED" ); 
+          then break; 
+        fi; 
+        sleep 30; 
+        x=$(( $x + 1 )); 
+      done
+    EOF
   }
 }
 

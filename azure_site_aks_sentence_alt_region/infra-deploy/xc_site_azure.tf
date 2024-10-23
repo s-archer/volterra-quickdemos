@@ -5,7 +5,7 @@ resource "volterra_azure_vnet_site" "site" {
   azure_region   = var.location
   resource_group = format("%srg-%s", var.prefix, "xc")
 
-  machine_type = "Standard_DS3_v2"
+  machine_type = "Standard_D3_v2"
 
   default_blocked_services = true
   logs_streaming_disabled  = true
@@ -27,7 +27,7 @@ resource "volterra_azure_vnet_site" "site" {
     no_outside_static_routes = true
 
     az_nodes {
-      azure_az = "1"
+      azure_az = "3"
 
       outside_subnet {
         subnet {
@@ -45,41 +45,41 @@ resource "volterra_azure_vnet_site" "site" {
     }
 
     # Uncomment below to create a three-node cluster
-    az_nodes {
-      azure_az = "2"
+    # az_nodes {
+    #   azure_az = "2"
 
-      outside_subnet {
-        subnet {
-          subnet_name         = azurerm_subnet.outside.name
-          vnet_resource_group = true
-        }
-      }
+    #   outside_subnet {
+    #     subnet {
+    #       subnet_name         = azurerm_subnet.outside.name
+    #       vnet_resource_group = true
+    #     }
+    #   }
 
-      inside_subnet {
-        subnet {
-          subnet_name         = azurerm_subnet.inside.name
-          vnet_resource_group = true
-        }
-      }
-    }
+    #   inside_subnet {
+    #     subnet {
+    #       subnet_name         = azurerm_subnet.inside.name
+    #       vnet_resource_group = true
+    #     }
+    #   }
+    # }
 
-    az_nodes {
-      azure_az = "3"
+    # az_nodes {
+    #   azure_az = "1"
 
-      outside_subnet {
-        subnet {
-          subnet_name         = azurerm_subnet.outside.name
-          vnet_resource_group = true
-        }
-      }
+    #   outside_subnet {
+    #     subnet {
+    #       subnet_name         = azurerm_subnet.outside.name
+    #       vnet_resource_group = true
+    #     }
+    #   }
 
-      inside_subnet {
-        subnet {
-          subnet_name         = azurerm_subnet.inside.name
-          vnet_resource_group = true
-        }
-      }
-    }
+    #   inside_subnet {
+    #     subnet {
+    #       subnet_name         = azurerm_subnet.inside.name
+    #       vnet_resource_group = true
+    #     }
+    #   }
+    # }
   }
 
   vnet {
@@ -92,31 +92,11 @@ resource "volterra_azure_vnet_site" "site" {
   }
   // One of the arguments from this list "nodes_per_az total_nodes no_worker_nodes" must be set
   no_worker_nodes = true
-  
-  lifecycle {
-      ignore_changes = [
-          labels
-      ]
-  }
 }
 
 resource "null_resource" "wait-for-site" {
   triggers = {
     depends = volterra_azure_vnet_site.site.id
-  }
-  provisioner "local-exec" {
-    command = <<-EOF
-      #!/bin/bash
-      x=1;
-      while [ $x -le 60 ]; 
-        do VALIDATION_STATE=$(curl -s --location --request GET '${var.volt_api_url}/config/namespaces/system/azure_vnet_sites/${var.site_name}' --header 'Authorization: APIToken ${volterra_api_credential.api.data}'| jq .spec.validation_state); 
-        if ( echo $VALIDATION_STATE | grep "VALIDATION_SUCCEEDED" ); 
-          then break; 
-        fi; 
-        sleep 30; 
-        x=$(( $x + 1 )); 
-      done
-    EOF
   }
 }
 

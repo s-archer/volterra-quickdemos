@@ -4,12 +4,15 @@ rendered_kubeconfig.yaml
 *.secret
 *.pem
 *.key
+*.tfvars
 vars.tf
 /vars.tf
 /*/vars.tf
+kubeconfig.yaml
 kube_config.yaml
 /kube_config.yaml
 /*/kube_config.yaml
+ssh-key.pub
 tmp/
 temp/
 # Local .terraform directories

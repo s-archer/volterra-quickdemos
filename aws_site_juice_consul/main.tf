@@ -19,7 +19,7 @@ provider "volterra" {
 provider "aws" {
   region                  = var.region
   shared_credentials_file = "~/.aws/credentials"
-  profile                 = "Default"
+  profile                 = "default"
 }
 
 data "http" "myip" {
