@@ -44,7 +44,7 @@ resource "azurerm_private_dns_resolver_virtual_network_link" "dns-xc-out-link" {
 data "azurerm_network_interface" "master-0-sli" {
   name                = "master-0-sli"
   resource_group_name = format("%srg-%s", var.prefix, "xc")
-  depends_on          = [volterra_tf_params_action.site]
+  depends_on          = [volterra_azure_vnet_site.site, volterra_tf_params_action.site]
 }
 
 # data "azurerm_network_interface" "master-1-sli" {

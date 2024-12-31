@@ -1,8 +1,14 @@
+# Instructions for deployment
+
+This sub-repo deploys F5 Distributed Cloud CE(s) into Azure using Secure Site Mesh version 2 (SMSv2).
+
+## Obtain and configure Azure credentials
+
 For Volterra cert auth .p12. need to:
 
 	export VES_P12_PASSWORD=<cert passphrase>
 
-To apply terraform, reference separate credentials file:
+To apply terraform, either reference the below vars as environment variables or reference a separate credentials file:
 
 terraform apply -var-file=../../creds/azure_creds.tfvars 
 
@@ -12,8 +18,6 @@ subscription_id = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 client_secret   = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 client_id       = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 tenant_id       = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-
 
 In order to populate these variables, you need to configure API access to your Azure account:
 
@@ -28,13 +32,19 @@ In order to populate these variables, you need to configure API access to your A
   - the 'Subscription ID' is your ${subscription_id}"
 - within your subscription, go to 'Access Control (IAM)' and 'Role Assignments'.  Add a Role Assignment and give your 'App' the 'Contributor Role'. 
 
+## Prepare variables
+
+Rename the `vars.tf.example` as `vars.tf` and update the values as far as `f5xc_sms_storage_account_type`.  The remaining vars do not need to be modified, but can be if required.
+
+## Obtain XC API Token
+
+https://docs.cloud.f5.com/docs-v2/administration/how-tos/user-mgmt/Credentials?searchQuery=credentials
+
+When you run terraform, you will be prompted fto input this token as the value for variable key name `f5xc_api_token`
+
 
 # Deployment Details
 
 The repo deploys the following components:
-  - F5 Distributed Cloud CE (1 or 3 nodes)
-  - AKS (deploy sentence app with Helm terraform)
-  - F5 Distributed Cloud LBs
-  - NGINX scale set (all nodes have public IPs so you can SSH to them, for dig and other test tools)
-  - Azure DNS private Resolver configured to forward queries for *.azure.local to XC CE nodes.
-  - Azure App Gateway to front the NGINX, just as a comparison.
+  - Azure Resource Group, VNet, 3 subnets (outside, inside, workers) 
+  - F5 Distributed Cloud CE (node count depends on value of `f5xc_sms_node_count` variable, and automatically distributed across AZs)

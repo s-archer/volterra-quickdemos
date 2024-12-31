@@ -80,6 +80,26 @@ resource "volterra_azure_vnet_site" "site" {
         }
       }
     }
+
+    hub {
+      express_route_disabled = true
+
+      spoke_vnets {
+        vnet {
+          resource_group = "arch-peer-1-rg"
+          vnet_name      = "arch-peer-1"
+        }
+        auto = true
+      }
+      
+      spoke_vnets {
+        vnet {
+          resource_group = "arch-peer-2-rg"
+          vnet_name      = "arch-peer-2"
+        }
+        auto = true
+      }
+    }
   }
 
   vnet {

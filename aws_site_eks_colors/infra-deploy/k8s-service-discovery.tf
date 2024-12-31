@@ -10,7 +10,7 @@ resource "volterra_discovery" "k8s" {
       // One of the arguments from this list "kubeconfig_url connection_info in_cluster" must be set
       kubeconfig_url {
         clear_secret_info {
-          url = format("string:///%s", base64encode(templatefile("${path.module}/k8s-templates/kubeconfig.tpl", {
+          url = format("string:///%s", base64encode(templatefile("${path.module}/templates/kubeconfig.tpl", {
             cluster_name = aws_eks_cluster.eks.arn
             ca_crt       = base64encode("${data.kubernetes_secret_v1.f5xc-secret.data["ca.crt"]}")
             server       = aws_eks_cluster.eks.endpoint
@@ -86,10 +86,15 @@ resource "kubernetes_cluster_role_v1" "f5xc-service-discovery" {
     name = "f5xc-service-discovery"
   }
 
+  # rule {
+  #   api_groups = [""]
+  #   resources  = ["endpoints", "namespaces", "nodes", "nodes/proxy", "pods", "services", "secrets", "serviceaccounts", "configmaps", "clusterroles"]
+  #   verbs      = ["get", "list", "watch"]
+  # }
   rule {
-    api_groups = [""]
-    resources  = ["endpoints", "namespaces", "nodes", "nodes/proxy", "pods", "services"]
-    verbs      = ["get", "list", "watch"]
+    api_groups = ["*"]
+    resources  = ["*"]
+    verbs      = ["*"]
   }
 }
 
@@ -110,7 +115,7 @@ resource "kubernetes_cluster_role_binding" "f5xc-service-discovery" {
 }
 
 resource "local_file" "rendered_kubeconfig" {
-  content = templatefile("${path.module}/k8s-templates/kubeconfig.tpl", {
+  content = templatefile("${path.module}/templates/kubeconfig.tpl", {
     cluster_name = aws_eks_cluster.eks.arn
     ca_crt       = base64encode("${data.kubernetes_secret_v1.f5xc-secret.data["ca.crt"]}")
     server       = aws_eks_cluster.eks.endpoint

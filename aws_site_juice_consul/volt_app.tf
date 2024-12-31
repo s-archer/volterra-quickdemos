@@ -55,11 +55,19 @@ resource "volterra_http_loadbalancer" "juice-tf" {
 
   advertise_on_public_default_vip = true
   no_challenge                    = true
-  round_robin                     = true
+  # round_robin                     = true
+  cookie_stickiness {
+    name = "arch-session"
+    ttl = 60
+    path = "/"
+    # ignore_httponly = true
+    # ignore_samesite = true
+    # ignore_secure   = true
+  }
   disable_rate_limit              = true
   no_service_policies             = true
   # disable_waf                     = true
-  multi_lb_app      = true
+  # multi_lb_app      = true
   user_id_client_ip = true
 
   https_auto_cert {

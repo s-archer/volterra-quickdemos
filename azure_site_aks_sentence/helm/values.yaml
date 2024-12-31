@@ -6,7 +6,7 @@ global:
   prefix: sentence
   registry: registry.gitlab.com/sentence-app/
   registryTag: latest
-  message: "namespace=${ namespace }"
+  message: "Region:-uksouth"
   siteenv: siteenv
   sitename: azure-aks-site
 
@@ -38,7 +38,7 @@ frontend:
   enabled: true
   registryTag: v3
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
-  serviceType: NodePort
+  serviceType: ClusterIP
 
 generator:
   enabled: true

@@ -6,8 +6,8 @@ global:
   prefix: sentence
   registry: registry.gitlab.com/sentence-app/
   registryTag: dev
-  message: Deployed-in-EKS
-  sitename: My-Site
+  message: "Region:-eu-west-2"
+  sitename: arch-aws-eks-site
 
 adjectives: 
   enabled: false
@@ -31,13 +31,13 @@ colors:
   enabled: true
   registryTag: v1
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
-  serviceType: NodePort
+  serviceType: ClusterIP
 
 frontend:
   enabled: false
   registryTag: v3
   # set either 'serviceType: NodePort' or 'serviceType: ClusterIP'
-  serviceType: NodePort
+  serviceType: ClusterIP
 
 generator:
   enabled: false

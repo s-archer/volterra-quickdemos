@@ -30,9 +30,10 @@ resource "aws_eks_node_group" "eks-nodes" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "${var.prefix}nodes"
   version         = aws_eks_cluster.eks.version
-  release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
+  # release_version = nonsensitive(data.aws_ssm_parameter.eks_ami_release_version.value)
   node_role_arn   = aws_iam_role.eks-node-role.arn
   subnet_ids      = [aws_subnet.eks_worker.id, aws_subnet.eks_worker_1.id, aws_subnet.eks_worker_2.id]
+  instance_types = ["m5.2xlarge"]
 
   scaling_config {
     desired_size = 1
@@ -43,6 +44,11 @@ resource "aws_eks_node_group" "eks-nodes" {
   update_config {
     max_unavailable = 1
   }
+
+  # launch_template {
+  #   name = aws_launch_template.hugepages.name
+  #   version = 1
+  # }
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Node Group handling.
   # Otherwise, EKS will not be able to properly delete EC2 Instances and Elastic Network Interfaces.
@@ -55,6 +61,22 @@ resource "aws_eks_node_group" "eks-nodes" {
     Name  = "${var.prefix}nodes"
     owner = var.uk_se_name
   }
+}
+
+resource "aws_launch_template" "hugepages" {
+  name = "hugepages"
+
+  block_device_mappings {
+    device_name = "/dev/sdf"
+
+    ebs {
+      volume_type = "standard"
+      volume_size = 200
+      delete_on_termination = true
+    }
+  }
+
+  user_data = filebase64("${path.module}/templates/eks-hugepage-user-data.tpl")
 }
 
 resource "aws_iam_role" "eks-cluster-role" {
