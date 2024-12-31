@@ -5,7 +5,7 @@ The repo deploys the following components:
   - F5 Distributed Cloud CE (node count depends on value of `f5xc_sms_node_count` variable, and automatically distributed across AZs)
   
 
-# Instructions for deployment
+# Instructions for Deployment
 
 This sub-repo deploys F5 Distributed Cloud CE(s) into Azure using Secure Site Mesh version 2 (SMSv2).
 
