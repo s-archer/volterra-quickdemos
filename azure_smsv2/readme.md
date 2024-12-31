@@ -1,3 +1,10 @@
+# Deployment Details
+
+The repo deploys the following components:
+  - Azure Resource Group, VNet, 3 subnets (outside, inside, workers) 
+  - F5 Distributed Cloud CE (node count depends on value of `f5xc_sms_node_count` variable, and automatically distributed across AZs)
+  
+
 # Instructions for deployment
 
 This sub-repo deploys F5 Distributed Cloud CE(s) into Azure using Secure Site Mesh version 2 (SMSv2).
@@ -41,10 +48,3 @@ Rename the `vars.tf.example` as `vars.tf` and update the values as far as `f5xc_
 https://docs.cloud.f5.com/docs-v2/administration/how-tos/user-mgmt/Credentials?searchQuery=credentials
 
 When you run terraform, you will be prompted fto input this token as the value for variable key name `f5xc_api_token`
-
-
-# Deployment Details
-
-The repo deploys the following components:
-  - Azure Resource Group, VNet, 3 subnets (outside, inside, workers) 
-  - F5 Distributed Cloud CE (node count depends on value of `f5xc_sms_node_count` variable, and automatically distributed across AZs)
