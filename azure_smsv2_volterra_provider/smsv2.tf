@@ -31,12 +31,12 @@ resource "volterra_securemesh_site_v2" "site" {
     }
   }
 
-  # active_enhanced_firewall_policies {
-  #   enhanced_firewall_policies {
-  #     name      = "arch-vsite-fw-policy"
-  #     namespace = "system"
-  #   }
-  # }
+  active_enhanced_firewall_policies {
+    enhanced_firewall_policies {
+      name      = "arch-vsite-fw-policy"
+      namespace = "system"
+    }
+  }
 
   lifecycle {
     ignore_changes = [
