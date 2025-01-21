@@ -7,5 +7,6 @@ output "ssh_f5_password" {
 }
 
 output "ssh_f5-1" {
-  value = "ssh admin@${azurerm_public_ip.outside_public_ip[0].ip_address}"
+  value = var.f5xc_sms_node_count > 0 ? "ssh admin@${azurerm_public_ip.outside_public_ip[0].ip_address}" : null
 }
+

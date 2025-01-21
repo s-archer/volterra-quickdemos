@@ -8,7 +8,7 @@ resource "volterra_securemesh_site_v2" "site" {
   enable_ha               = false
   labels = {
     (volterra_known_label_key.key.key) = (volterra_known_label.label.value)
-    "ves.io/provider" = "ves-io-AZURE"
+    "ves.io/provider"                  = "ves-io-AZURE"
   }
 
   re_select {
@@ -17,6 +17,31 @@ resource "volterra_securemesh_site_v2" "site" {
 
   azure {
     not_managed {}
+  }
+
+  local_vrf {
+    sli_config {
+      static_routes {
+        static_routes {
+          ip_prefixes = ["10.1.0.0/16", "10.2.0.0/16"]
+          ip_address  = "10.0.102.1"
+          attrs       = ["ROUTE_ATTR_INSTALL_FORWARDING"]
+        }
+      }
+    }
+  }
+
+  # active_enhanced_firewall_policies {
+  #   enhanced_firewall_policies {
+  #     name      = "arch-vsite-fw-policy"
+  #     namespace = "system"
+  #   }
+  # }
+
+  lifecycle {
+    ignore_changes = [
+      labels
+    ]
   }
 }
 
@@ -76,7 +101,7 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
     custom_data = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
       cluster_name = format("%s-node-%s", local.f5xc_sms_name, count.index),
       # token        = restful_resource.token[count.index].output.spec.content
-      token        = volterra_token.smsv2-token[count.index].id
+      token = volterra_token.smsv2-token[count.index].id
     }))
   }
 
@@ -87,22 +112,24 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
   tags = {
     Name   = "${var.prefix}-node-[count.index]"
     source = "terraform"
-    owner       = var.owner
+    owner  = var.owner
   }
 }
 
 
 resource "azurerm_network_interface" "outside_nic" {
-  count               = var.f5xc_sms_node_count
-  name                = "${var.prefix}-outside-nic-${count.index}"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
+  count                         = var.f5xc_sms_node_count
+  name                          = "${var.prefix}-outside-nic-${count.index}"
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.rg.name
+  enable_accelerated_networking = true
 
   ip_configuration {
     name                          = "${var.prefix}-outside-ip-${count.index}"
     subnet_id                     = azurerm_subnet.outside.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.outside_public_ip[count.index].id
+
   }
   tags = {
     Name   = "${var.prefix}-outside-nic-${count.index}"
@@ -128,11 +155,12 @@ resource "azurerm_public_ip" "outside_public_ip" {
 
 
 resource "azurerm_network_interface" "inside_nic" {
-  count                = var.f5xc_sms_node_count
-  name                 = "${var.prefix}-inside-nic-${count.index}"
-  location             = var.location
-  resource_group_name  = azurerm_resource_group.rg.name
-  enable_ip_forwarding = true
+  count                         = var.f5xc_sms_node_count
+  name                          = "${var.prefix}-inside-nic-${count.index}"
+  location                      = var.location
+  resource_group_name           = azurerm_resource_group.rg.name
+  enable_ip_forwarding          = true
+  enable_accelerated_networking = true
 
   ip_configuration {
     name                          = "${var.prefix}-inside-ip-${count.index}"

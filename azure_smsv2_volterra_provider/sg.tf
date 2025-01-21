@@ -61,10 +61,10 @@ resource "azurerm_network_security_rule" "inside_allow_https" {
   priority                    = 200
   direction                   = "Inbound"
   access                      = "Allow"
-  protocol                    = "Tcp"
+  protocol                    = "*"
   source_port_range           = "*"
-  destination_port_range      = "443"
-  destination_address_prefix  = "*"
+  destination_port_range      = "*"
+  destination_address_prefix  = "10.0.0.0/8"
   source_address_prefixes     = ["10.0.0.0/8"]
   resource_group_name         = azurerm_resource_group.rg.name
   network_security_group_name = format("%s-inside-nsg-%s", var.prefix, random_id.id.hex)

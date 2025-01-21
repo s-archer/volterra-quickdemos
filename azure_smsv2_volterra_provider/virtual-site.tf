@@ -1,13 +1,13 @@
 resource "volterra_known_label_key" "key" {
-    key = "virtual-site-terraform"
-    namespace = "shared"  
-    description = "Used to define lables for Virtual Sites "  
+  key         = "virtual-site-terraform"
+  namespace   = "shared"
+  description = "Used to define lables for Virtual Sites "
 }
 
 resource "volterra_known_label" "label" {
-  key = volterra_known_label_key.key.key
+  key       = volterra_known_label_key.key.key
   namespace = "shared"
-  value       = local.f5xc_sms_name
+  value     = local.f5xc_sms_name
 }
 
 resource "volterra_virtual_site" "ce" {
