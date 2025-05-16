@@ -1,0 +1,91 @@
+# The following four vars are placeholder/empty vars.  The values are populated from a separate creds.tfvars file, stored
+# outside of your repo folder. Use the -var-file=../../creds/creds.tfvars flag when applying config to use the values from 
+# your creds.tfvars file.  The creds.tfvars file must contain four variables defined like this (but not commented out):
+#
+# subscription_id = "blahBlahBlahblahBlahBlah"
+# client_secret   = "blahBlahBlahblahBlahBlah"
+# client_id       = "blahBlahBlahblahBlahBlah"
+# tenant_id       = "blahBlahBlahblahBlahBlah"
+
+variable "subscription_id" {}
+variable "client_secret" {}
+variable "client_id" {}
+variable "tenant_id" {}
+
+locals {
+  azs = [
+    for each_az in var.azs_short : format("%s%s", var.location, each_az)
+  ]
+}
+
+variable "location" {
+  description = "Azure location name"
+  default     = "uksouth"
+}
+
+variable "azs_short" {
+  description = "Assumes three AZs within region.  Locals below will format the full AZ names based on Region"
+  default     = ["1", "2", "3"]
+}
+
+variable "prefix" {
+  description = "prefix used for naming objects created in azure"
+  default     = "my-prefix-"
+}
+
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "my-name"
+}
+
+variable "volterra_namespace" {
+  type        = string
+  description = "Volterra app namespace where the object will be created. This cannot be system or shared ns."
+  default     = "my-ns"
+}
+
+variable "aks_k8s_namespace" {
+  type        = string
+  description = "External k8s namespace where objects (LB / k8s svc) will be created by XC, if no namespace is included."
+  default     = "my-aks-k8s-ns"
+}
+
+variable "eks_k8s_namespace" {
+  type        = string
+  description = "External k8s namespace where objects (LB / k8s svc) will be created by XC, if no namespace is included."
+  default     = "my-eks-k8s-ns"
+}
+
+variable "site_name" {
+  type        = string
+  description = "Name of site to be created in Volterra and azure"
+  default     = "my-site"
+}
+
+variable "base" {
+  default = "aks"
+}
+
+variable "cloud_cred_name" {
+  type        = string
+  description = "The object name for your cloud credentials witin XC"
+  default     = "my-cred"
+}
+
+variable "volt_tenant" {
+  type        = string
+  description = "XC tenant name"
+  default     = "my-tenant"
+}
+
+variable "volt_api_url" {
+  type        = string
+  description = "XC tenant api url"
+  default     = "https://my-tenant-url/api"
+}
+
+variable "volt_api_p12_file" {
+  type        = string
+  description = "Volterra tenant api key"
+  default     = "../../creds/my-api-creds.p12"
+}

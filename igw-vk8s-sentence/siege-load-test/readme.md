@@ -1,1 +1,0 @@
-siege -b -c 25 -r 10 -i -f ./urls.txt --no-parser --no-follow

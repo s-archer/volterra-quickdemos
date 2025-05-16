@@ -1,0 +1,32 @@
+variable cidr {
+  description = "Azure VPC CIDR"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
+variable f5_xc_instance_type {
+  description = "Specifies the size of the virtual machine."
+  type        = string
+  default     = "Standard_DS3_v2"
+}
+
+variable location {
+  description = "Azure VPC Region"
+  type        = string
+  default     = "uksouth"
+}
+
+variable "prefix" { 
+  description = "prefix used for naming objects created in AWS"
+  default = "arch-f5xc-tf"
+}
+
+variable "site_token" {
+  description = "F5 XC Site Token"
+  default     = "my-site-token-goes-here"
+}
+
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "arch"
+}

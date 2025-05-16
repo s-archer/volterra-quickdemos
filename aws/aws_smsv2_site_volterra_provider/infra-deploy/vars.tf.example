@@ -1,0 +1,90 @@
+locals {
+  f5xc_sms_name = format("%s-site-%s", var.prefix, random_id.id.hex)
+  azs = [
+    for each_az in var.azs_short : format("%s%s", var.region, each_az)
+  ]
+}
+
+variable "f5xc_ami" {
+  description = "value of ami to use for XC instance - get this from XC UI (click site ... and select 'copy image name')"
+  default     = "f5xc-ce-9.2024.44-20250102062607"
+}
+
+variable "f5xc_sms_node_count" {
+  description = "Number of nodes (sites) to deploy"
+  default     = 3
+}
+
+variable "f5xc_sms_description" {
+  type    = string
+  default = "Arch Azure smsv2 site created with Terraform"
+}
+
+variable "region" {
+  description = "AWS region name"
+  default     = "eu-west-2"
+}
+
+variable "azs_short" {
+  description = "Assumes three AZs within region.  Locals below will format the full AZ names based on Region"
+  default     = ["a", "b", "c"]
+}
+
+variable "cidr" {
+  description = "cidr used for AWS VPC"
+  default     = "10.0.0.0/16"
+}
+
+variable "prefix" {
+  description = "prefix used for naming objects created in AWS"
+  default     = "my-tf-aws-smsv2"
+}
+
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "<name>"
+}
+
+variable "f5xc_namespace" {
+  type        = string
+  description = "F5 XC app namespace where the object will be created. This cannot be system or shared ns."
+  default     = "my-namespace"
+}
+
+variable "aks_k8s_namespace" {
+  type        = string
+  description = "External k8s namespace where objects (LB / k8s svc) will be created by XC, if no namespace is included."
+  default     = "azure-aks"
+}
+
+variable "eks_k8s_namespace" {
+  type        = string
+  description = "External k8s namespace where objects (LB / k8s svc) will be created by XC, if no namespace is included."
+  default     = "aws-eks"
+}
+
+variable "base" {
+  default = "eks"
+}
+
+variable "f5xc_tenant" {
+  type        = string
+  description = "F5 XC tenant name"
+  default     = "my-tenant-abcxyz"
+}
+
+variable "f5xc_api_url" {
+  type        = string
+  description = "F5 XC tenant api url"
+  default     = "https://my-tenant.console.ves.volterra.io/api"
+}
+
+variable "f5xc_api_p12_file" {
+  type        = string
+  description = "F5 XC tenant api key"
+  default     = "../../../../creds/my-tenant.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "sa_name" {
+  default = "f5xc"
+}

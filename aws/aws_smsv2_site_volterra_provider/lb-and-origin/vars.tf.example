@@ -1,0 +1,11 @@
+variable "f5xc_api_url" {
+  type        = string
+  description = "Volterra tenant api url"
+  default = "https://tenant.console.ves.volterra.io/api"
+}
+
+variable "f5xc_api_p12_file" {
+  type        = string
+  description = "Volterra tenant api key"
+  default     = "../path/to/api-creds.p12"
+}
