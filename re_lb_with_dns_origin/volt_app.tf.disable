@@ -103,7 +103,7 @@ resource "volterra_http_loadbalancer" "lb" {
       }
       headers {
         name = "Host"
-        exact = "adminae53.fnz.volterra.link"
+        exact = "adminae53.volterra.link"
       }
       host_rewrite = var.vanity_fqdn
     }
