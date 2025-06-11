@@ -14,8 +14,6 @@ resource "proxmox_vm_qemu" "master-vm" {
   agent     = 1
   onboot    = true
   skip_ipv6 = true # required until https://github.com/Telmate/terraform-provider-proxmox/issues/1015 is fixed
-  # # Enable hugepages with custom QEMU args
-  # args = "-mem-prealloc -mem-path /dev/hugepages"
 
   cpu {
     sockets = 1

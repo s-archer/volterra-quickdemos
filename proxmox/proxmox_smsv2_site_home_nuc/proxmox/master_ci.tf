@@ -12,10 +12,3 @@ resource "proxmox_cloud_init_disk" "master-ci" {
     token = volterra_token.smsv2-token.id
   })
 }
-
-resource "local_file" "cloud_init_disk" {
-  content = templatefile("${path.module}/templates/user-data.tpl", {
-    token = volterra_token.smsv2-token.id
-  })
-  filename = "${path.module}/templates/user-data-output.yaml"
-}
