@@ -12,7 +12,7 @@ Example Terraform scripts to deploy F5XC Secure Mesh sites (v2) on Proxmox Virtu
 Once the supported version has exceeded the above version, you can follow the instructions in the next bullet instead.
 
 - Download the latest qcow2 image.  Easiest way to do this is to create a quick clickops SMSv2 KVM site and click `...` > `Copy Image Name`.  Then directly on your Proxmox server, run `wget <image name>`
-- Create a template from the download file on your Proxmox server, adjusting the full (!) path to the downloaded qcow2 image, the template id and the Proxmox iso storage to save it.  Use the [create template script](create_f5xc_ce_template.sh) directly on the Proxmox server.
+- Create a template from the download qcow2 image file on your Proxmox server, adjusting the full (!) path to the downloaded qcow2 image, the template id and the Proxmox iso storage to save it.  Use the [create template script](create_f5xc_ce_template.sh) directly on the Proxmox server.
 
 ## Create terraform.tfvars
 
