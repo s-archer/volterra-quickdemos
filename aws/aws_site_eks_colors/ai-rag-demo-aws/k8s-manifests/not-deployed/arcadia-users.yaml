@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-users
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-users
+  template:
+    metadata:
+      labels:
+        app: arcadia-users
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-users:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

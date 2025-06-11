@@ -1,0 +1,310 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-db
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-db
+  template:
+    metadata:
+      labels:
+        app: arcadia-db
+    spec:
+      containers:
+        - name: arcadia-db
+          image: sorinboiaf5/arcadia-db:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 27017
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-db
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+      name: mongo
+  selector:
+    app: arcadia-db
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-frontend
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-frontend
+  template:
+    metadata:
+      labels:
+        app: arcadia-frontend
+    spec:
+      containers:
+        - name: arcadia-frontend
+          image: sorinboiaf5/arcadia-frontend:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-frontend
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-frontend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-login
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-login
+  template:
+    metadata:
+      labels:
+        app: arcadia-login
+    spec:
+      containers:
+        - name: arcadia-login
+          image: sorinboiaf5/arcadia-login:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-login
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-login
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-stock-transaction
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-stock-transaction
+  template:
+    metadata:
+      labels:
+        app: arcadia-stock-transaction
+    spec:
+      containers:
+        - name: arcadia-stock-transaction
+          image: sorinboiaf5/arcadia-stock_transaction:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-stock-transaction
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-stock-transaction
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-stocks
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-stocks
+  template:
+    metadata:
+      labels:
+        app: arcadia-stocks
+    spec:
+      containers:
+        - name: arcadia-stocks
+          image: sorinboiaf5/arcadia-stocks:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-stocks
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-stocks
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-users
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-users
+  template:
+    metadata:
+      labels:
+        app: arcadia-users
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-users:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-users
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-users
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-ai
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-ai
+  template:
+    metadata:
+      labels:
+        app: arcadia-ai
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-ai:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: LLM
+              value: 10.1.1.6:30041
+            - name: STOCKTAPIHOST
+              value: arcadia-stock-transaction
+            - name: LLMMODEL
+              value: none
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-ai
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-ai
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-ai-rag
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-ai-rag
+  template:
+    metadata:
+      labels:
+        app: arcadia-ai-rag
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-ai-rag:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-ai-rag
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+      name: http
+  selector:
+    app: arcadia-ai-rag
+ 

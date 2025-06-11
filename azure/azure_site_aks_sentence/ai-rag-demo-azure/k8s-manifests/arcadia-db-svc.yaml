@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: arcadia-db
+  namespace: arcadiacrypto
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+      name: mongo
+  selector:
+    app: arcadia-db

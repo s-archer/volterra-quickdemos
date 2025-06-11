@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-stock-transaction
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-stock-transaction
+  template:
+    metadata:
+      labels:
+        app: arcadia-stock-transaction
+    spec:
+      containers:
+        - name: arcadia-stock-transaction
+          image: sorinboiaf5/arcadia-stock_transaction:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

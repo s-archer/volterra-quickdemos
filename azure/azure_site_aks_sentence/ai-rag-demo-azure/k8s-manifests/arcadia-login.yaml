@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-login
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-login
+  template:
+    metadata:
+      labels:
+        app: arcadia-login
+    spec:
+      containers:
+        - name: arcadia-login
+          image: sorinboiaf5/arcadia-login:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

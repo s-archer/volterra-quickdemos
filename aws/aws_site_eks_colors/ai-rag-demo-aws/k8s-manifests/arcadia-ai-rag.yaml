@@ -1,0 +1,23 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-ai-rag
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-ai-rag
+  template:
+    metadata:
+      labels:
+        app: arcadia-ai-rag
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-ai-rag:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

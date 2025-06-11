@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-stocks
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-stocks
+  template:
+    metadata:
+      labels:
+        app: arcadia-stocks
+    spec:
+      containers:
+        - name: arcadia-stocks
+          image: sorinboiaf5/arcadia-stocks:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+

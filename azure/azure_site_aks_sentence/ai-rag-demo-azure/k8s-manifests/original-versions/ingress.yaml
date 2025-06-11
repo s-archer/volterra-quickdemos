@@ -1,0 +1,164 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: arcadia-ingress
+  namespace: arcadiacrypto
+spec:
+  rules:
+  - host: "*.example.com"
+    http:
+      paths:
+      - path: /v1/user
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-users
+            port:
+              number: 80
+      - path: /v1/login
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-login
+            port:
+              number: 80
+      - path: /v1/stock
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stocks
+            port:
+              number: 80
+      - path: /v1/stockt
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stock-transaction
+            port:
+              number: 80
+      - path: /v1/ai
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai
+            port:
+              number: 80
+      - path: /v1/ai
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai-rag
+            port:
+              number: 80
+      - path: /v1/ai-rag
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai-rag
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-frontend
+            port:
+              number: 80
+  - host: "*.workshop.emea.f5se.com"
+    http:
+      paths:
+      - path: /v1/user
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-users
+            port:
+              number: 80
+      - path: /v1/login
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-login
+            port:
+              number: 80
+      - path: /v1/stock
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stocks
+            port:
+              number: 80
+      - path: /v1/stockt
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stock-transaction
+            port:
+              number: 80
+      - path: /v1/ai
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-frontend
+            port:
+              number: 80
+  - host: "*.aws.internal"
+    http:
+      paths:
+      - path: /v1/user
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-users
+            port:
+              number: 80
+      - path: /v1/login
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-login
+            port:
+              number: 80
+      - path: /v1/stock
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stocks
+            port:
+              number: 80
+      - path: /v1/stockt
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-stock-transaction
+            port:
+              number: 80
+      - path: /v1/ai
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai
+            port:
+              number: 80
+      - path: /v1/ai-rag
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-ai-rag
+            port:
+              number: 80
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: arcadia-frontend
+            port:
+              number: 80
+ 

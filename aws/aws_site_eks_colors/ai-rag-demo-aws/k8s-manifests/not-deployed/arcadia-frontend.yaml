@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-frontend
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-frontend
+  template:
+    metadata:
+      labels:
+        app: arcadia-frontend
+    spec:
+      containers:
+        - name: arcadia-frontend
+          image: sorinboiaf5/arcadia-frontend:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
