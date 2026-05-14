@@ -1,7 +1,9 @@
 resource "volterra_discovery" "k8s" {
-  count     = var.f5xc_sms_node_count
-  name      = "${var.prefix}sentence-${count.index}"
-  namespace = "system"
+  # count     = var.f5xc_sms_node_count
+  # name      = "${var.prefix}sentence-${count.index}"
+  name      = "${var.prefix}sentence"
+  # namespace = "system"
+  namespace = var.f5xc_namespace
   depends_on = [
 
   ]
@@ -34,11 +36,18 @@ resource "volterra_discovery" "k8s" {
     }
   }
   where {
-    site {
-      network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
+    # site {
+    #   network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
+    #   ref {
+    #     name      = volterra_securemesh_site_v2.site[count.index].name
+    #     namespace = volterra_securemesh_site_v2.site[count.index].namespace
+    #     # tenant    = var.f5xc_tenant
+    #   }
+    # }
+    virtual_site {
       ref {
-        name      = volterra_securemesh_site_v2.site[count.index].name
-        namespace = volterra_securemesh_site_v2.site[count.index].namespace
+        name      = volterra_virtual_site.ce.name
+        namespace = volterra_virtual_site.ce.namespace
         # tenant    = var.f5xc_tenant
       }
     }

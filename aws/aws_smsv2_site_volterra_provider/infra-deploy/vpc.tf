@@ -12,7 +12,7 @@ resource "aws_vpc" "f5xc" {
 
 resource "aws_subnet" "eks_outside" {
   count             = var.f5xc_sms_node_count
-  cidr_block        = "10.0.1${count.index}1.0/24"
+  cidr_block        = "10.0.${count.index + 1}1.0/24"
   availability_zone = local.azs[count.index]
   vpc_id            = aws_vpc.f5xc.id
   tags = {
@@ -22,7 +22,7 @@ resource "aws_subnet" "eks_outside" {
 
 resource "aws_subnet" "eks_inside" {
   count             = var.f5xc_sms_node_count
-  cidr_block        = "10.0.1${count.index}2.0/24"
+  cidr_block        = "10.0.${count.index + 1}2.0/24"
   availability_zone = local.azs[count.index]
   vpc_id            = aws_vpc.f5xc.id
   tags = {
@@ -31,9 +31,9 @@ resource "aws_subnet" "eks_inside" {
 }
 
 resource "aws_subnet" "eks_worker" {
-  count                   = var.f5xc_sms_node_count
+  count                   = 3
   map_public_ip_on_launch = true
-  cidr_block              = "10.0.1${count.index}3.0/24"
+  cidr_block              = "10.0.${count.index + 1}3.0/24"
   availability_zone       = local.azs[count.index]
   vpc_id                  = aws_vpc.f5xc.id
   tags = {
@@ -43,7 +43,7 @@ resource "aws_subnet" "eks_worker" {
 
 resource "aws_subnet" "eks_control" {
   count                   = 3
-  cidr_block              = "10.0.1${count.index}4.0/24"
+  cidr_block              = "10.0.${count.index + 1}4.0/24"
   map_public_ip_on_launch = true
   availability_zone       = local.azs[count.index]
   vpc_id                  = aws_vpc.f5xc.id
@@ -54,12 +54,42 @@ resource "aws_subnet" "eks_control" {
 
 resource "aws_subnet" "eks_data" {
   count                   = 3
-  cidr_block              = "10.0.1${count.index}5.0/24"
+  cidr_block              = "10.0.${count.index + 1}5.0/24"
   map_public_ip_on_launch = true
   availability_zone       = local.azs[count.index]
   vpc_id                  = aws_vpc.f5xc.id
   tags = {
     Name = "${var.prefix}data-${count.index}"
+  }
+}
+
+resource "aws_subnet" "eks_bip_mgmt" {
+  count             = 1
+  cidr_block        = "10.0.${count.index + 1}6.0/24"
+  availability_zone = local.azs[count.index]
+  vpc_id            = aws_vpc.f5xc.id
+  tags = {
+    Name = "${var.prefix}bip-mgmt-${count.index}"
+  }
+}
+
+resource "aws_subnet" "eks_bip_outside" {
+  count             = 1
+  cidr_block        = "10.0.${count.index + 1}7.0/24"
+  availability_zone = local.azs[count.index]
+  vpc_id            = aws_vpc.f5xc.id
+  tags = {
+    Name = "${var.prefix}bip-outside-${count.index}"
+  }
+}
+
+resource "aws_subnet" "eks_bip_inside" {
+  count             = 1
+  cidr_block        = "10.0.${count.index + 1}8.0/24"
+  availability_zone = local.azs[count.index]
+  vpc_id            = aws_vpc.f5xc.id
+  tags = {
+    Name = "${var.prefix}bip-inside-${count.index}"
   }
 }
 

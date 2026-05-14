@@ -1,8 +1,8 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
-      # version = "~> 3.0"
+      source  = "hashicorp/aws"
+      version = "5.97.0"
     }
     kubernetes = {
       source  = "hashicorp/kubernetes"
@@ -11,7 +11,11 @@ terraform {
     volterra = {
       source = "volterraedge/volterra"
       # version = "0.11.20"
-      version = "0.11.43"
+      version = "0.11.49"
+    }
+    http = {
+      source  = "hashicorp/http"
+      version = "~> 3.0"
     }
   }
 }
@@ -42,9 +46,9 @@ provider "volterra" {
   url          = var.f5xc_api_url
 }
 
-# data "http" "myip" {
-#   url = "https://ifconfig.me"
-# }
+data "http" "myip" {
+  url = "https://ifconfig.me/ip"
+}
 
 resource "random_id" "id" {
   byte_length = 2
