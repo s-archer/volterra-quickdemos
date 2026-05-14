@@ -7,7 +7,7 @@ locals {
 
 variable "f5xc_ami" {
   description = "value of ami to use for XC instance - get this from XC UI (click site ... and select 'copy image name')"
-  default     = "f5xc-ce-9.2024.44-20250102062607"
+  default     = "*f5xc-ce-crt-20251002*"
 }
 
 variable "f5xc_sms_node_count" {
