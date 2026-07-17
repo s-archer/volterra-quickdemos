@@ -28,7 +28,7 @@ resource "azurerm_private_dns_resolver_forwarding_rule" "dns-xc-out" {
   domain_name               = "azure.local."
   enabled                   = true
   target_dns_servers {
-    ip_address = data.azurerm_network_interface.master-0-sli.private_ip_address
+    ip_address = "data.azurerm_network_interface.master-0-sli.private_ip_address"
     port       = 53
   }
 

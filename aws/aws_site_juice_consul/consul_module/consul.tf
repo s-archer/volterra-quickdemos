@@ -2,8 +2,9 @@ data "aws_ami" "ubuntu" {
   most_recent = true
 
   filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    name = "name"
+    # values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+    values = ["al2023-ami-ecs-hvm-2023*x86*"]
   }
 
   filter {
@@ -11,7 +12,8 @@ data "aws_ami" "ubuntu" {
     values = ["hvm"]
   }
 
-  owners = ["099720109477"] # Canonical
+  #owners = ["099720109477"] # Canonical
+  owners = ["591542846629"] # AWS
 }
 
 resource "aws_instance" "consul" {

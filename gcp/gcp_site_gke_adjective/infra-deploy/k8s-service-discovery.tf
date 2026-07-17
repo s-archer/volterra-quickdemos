@@ -30,8 +30,10 @@ resource "volterra_discovery" "k8s" {
     site {
       network_type = "VIRTUAL_NETWORK_SITE_LOCAL_INSIDE"
       ref {
-        name      = volterra_gcp_vpc_site.site.name
-        namespace = volterra_gcp_vpc_site.site.namespace
+        # name      = volterra_gcp_vpc_site.site.name
+        # namespace = volterra_gcp_vpc_site.site.namespace
+        name      = volterra_securemesh_site_v2.site.name
+        namespace = volterra_securemesh_site_v2.site.namespace
         # tenant    = var.volt_tenant
       }
     }
@@ -46,6 +48,7 @@ data "google_container_cluster" "cluster" {
 }
 
 module "gke_auth" {
+  depends_on = [ google_container_cluster.primary ]
   source       = "terraform-google-modules/kubernetes-engine/google//modules/auth"
   project_id   = var.project_id
   cluster_name = google_container_cluster.primary.name

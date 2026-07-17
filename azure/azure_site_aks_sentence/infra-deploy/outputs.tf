@@ -6,6 +6,10 @@ output "eks-namespace" {
   value = var.eks_k8s_namespace
 }
 
+output "azure-site-name" {
+  value = local.site_name
+}
+
 output "message" {
   value = "Now cd ../helm and tfa to deploy the sentence app containers"
 }

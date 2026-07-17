@@ -15,7 +15,7 @@ resource "volterra_http_loadbalancer" "ollama" {
         network = "SITE_NETWORK_INSIDE"
         site {
           namespace = "system"
-          name      = "arch-tf-azure-aks-site-75e1"
+          name      = "arch-tf-azure-aks-site-fa83"
         }
       }
     }
@@ -55,7 +55,7 @@ resource "volterra_http_loadbalancer" "arcadia-ai" {
         network = "SITE_NETWORK_INSIDE"
         site {
           namespace = "system"
-          name      = "arch-tf-azure-aks-site-75e1"
+          name      = "arch-tf-azure-aks-site-fa83"
         }
       }
     }
@@ -86,7 +86,7 @@ resource "volterra_http_loadbalancer" "arcadia-ai-rag" {
         network = "SITE_NETWORK_INSIDE"
         site {
           namespace = "system"
-          name      = "arch-tf-azure-aks-site-75e1"
+          name      = "arch-tf-azure-aks-site-fa83"
         }
       }
     }

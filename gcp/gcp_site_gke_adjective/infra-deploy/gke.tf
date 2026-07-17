@@ -1,7 +1,7 @@
 # GKE cluster
 data "google_container_engine_versions" "gke_version" {
   location       = var.gcp_region
-  version_prefix = "1.28."
+  version_prefix = "1.33"
 }
 
 resource "google_container_cluster" "primary" {

@@ -18,35 +18,35 @@ resource "volterra_origin_pool" "colors" {
 
         site {
           namespace = "system"
-          name      = "arch-aws-eks-site"
+          name      = "arch-smsv1-aws-eks-site"
         }
       }
     }
   }
 }
 
-# resource "volterra_origin_pool" "sentence" {
-#   name                   = "sentence-aws-frontend"
-#   namespace              = var.volterra_namespace
-#   description            = "Sentence Application Frontend"
-#   endpoint_selection     = "LOCAL_PREFERRED"
-#   loadbalancer_algorithm = "LB_OVERRIDE"
-#   port                   = 80
-#   no_tls                 = true
+resource "volterra_origin_pool" "sentence" {
+  name                   = "sentence-smsv1-aws-frontend"
+  namespace              = var.volterra_namespace
+  description            = "Sentence Application Frontend"
+  endpoint_selection     = "LOCAL_PREFERRED"
+  loadbalancer_algorithm = "LB_OVERRIDE"
+  port                   = 80
+  no_tls                 = true
 
-#   origin_servers {
+  origin_servers {
 
-#     k8s_service {
-#       service_name   = format("sentence-frontend.%s", data.terraform_remote_state.eks.outputs.eks-namespace)
-#       inside_network = true
+    k8s_service {
+      service_name   = format("sentence-frontend.%s", data.terraform_remote_state.eks.outputs.eks-namespace)
+      inside_network = true
 
-#       site_locator {
+      site_locator {
 
-#         site {
-#           namespace = "system"
-#           name      = "arch-aws-eks-site"
-#         }
-#       }
-#     }
-#   }
-# }
+        site {
+          namespace = "system"
+          name      = "arch-smsv1-aws-eks-site"
+        }
+      }
+    }
+  }
+}

@@ -9,12 +9,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
     name = "default"
     # Next line identifies the worker subnet id.
     vnet_subnet_id = azurerm_subnet.workers.id
-    node_count     = 1
-    vm_size        = "Standard_DS2_v2"
+    node_count     = 2
+    vm_size        = "Standard_DS4_v2"
     zones          = ["1"]
     upgrade_settings {
       max_surge = "10%"
     }
+    temporary_name_for_rotation = "archtemp"
   }
 
   network_profile {

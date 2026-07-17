@@ -2,15 +2,21 @@ terraform {
   required_providers {
     volterra = {
       source  = "volterraedge/volterra"
-      version = "0.11.24"
+      version = "0.11.43"
     }
     azurerm = {
-      version = "3.49.0"
+      # version = "3.49.0"
+      version = "4.31.0"
     }
     helm = {
       source  = "hashicorp/helm"
       version = "2.9.0"
     }
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "2.37.1"
+    }
+    local = ">= 2.2.3"
   }
 }
 

@@ -17,7 +17,8 @@ resource "volterra_origin_pool" "sentence" {
 
         site {
           namespace = "system"
-          name      = "arch-tf-azure-aks-site-75e1"
+          # name      = "arch-tf-azure-aks-site-75e1"
+          name      = data.terraform_remote_state.aks.outputs.azure-site-name
         }
       }
     }

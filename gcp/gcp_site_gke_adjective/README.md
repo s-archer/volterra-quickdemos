@@ -1,12 +1,13 @@
 # Provision a GCP VPC, GKE Cluster & XC GCP Site
 
-1. gcloud auth login --project f5-gcs-4261-sales-emea-sa 
+1. # gcloud auth login --project f5-gcs-4261-sales-emea-sa
+   gcloud auth application-default login
 
-2. cd infra-deploy 
+2. cd infra-deploy
 
 3. tfa
 
-4. To get kubeconfig:  
+4. To get kubeconfig:
     gcloud container clusters get-credentials $(terraform output -raw kubernetes_cluster_name) --region $(terraform output -raw region)
 
 - Then you can deploy sentence app adjectives with helm (`cd ../helm` and `tfa`)
