@@ -1,0 +1,88 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2822
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \{\
+  "tenant": "automation-rllmbbuf",\
+  "namespace": "system",\
+  "name": "kk-ipsec-frr-vm1-to-kkawadkar-stg-aws-smg-single-01",\
+  "uid": "c7c0d2d1-2927-4293-b462-2c63e94c78d0",\
+  "description": "external connector from kk-ipsec-frr-vm1 to kkawadkar-stg-aws-smg-single-01",\
+  "disabled": false,\
+  "labels": \{\},\
+  "annotations": \{\},\
+  "owner_view": null,\
+  "metadata": \{\
+    "name": "kk-ipsec-frr-vm1-to-kkawadkar-stg-aws-smg-single-01",\
+    "namespace": "system",\
+    "labels": \{\},\
+    "annotations": \{\},\
+    "description": "external connector from kk-ipsec-frr-vm1 to kkawadkar-stg-aws-smg-single-01",\
+    "disable": false\
+  \},\
+  "system_metadata": \{\
+    "uid": "c7c0d2d1-2927-4293-b462-2c63e94c78d0",\
+    "creation_timestamp": "2026-06-24T05:00:22.195432105Z",\
+    "deletion_timestamp": null,\
+    "modification_timestamp": "2026-06-24T05:30:43.727617381Z",\
+    "initializers": null,\
+    "finalizers": [],\
+    "tenant": "automation-rllmbbuf",\
+    "creator_class": "prism",\
+    "creator_id": "k.kawadkar@f5.com",\
+    "object_index": 0,\
+    "owner_view": null,\
+    "labels": \{\}\
+  \},\
+  "get_spec": \{\
+    "ce_site_reference": \{\
+      "tenant": "automation-rllmbbuf",\
+      "namespace": "system",\
+      "name": "kkawadkar-stg-aws-smg-single-01"\
+    \},\
+    "ipsec": \{\
+      "ike_parameters": \{\
+        "ike_phase1_profile": \{\
+          "tenant": "ves-io",\
+          "namespace": "shared",\
+          "name": "ves-io-f5-ike-phase1-default-profile"\
+        \},\
+        "ike_phase2_profile": \{\
+          "tenant": "ves-io",\
+          "namespace": "shared",\
+          "name": "ves-io-f5-ike-phase2-default-profile-no-pfs"\
+        \},\
+        "initiator": \{\},\
+        "dpd_keep_alive_timer": \{\
+          "timeout": 3\
+        \},\
+        "use_default_local_ike_id": \{\},\
+        "rm_ip_address": \{\
+          "ipv4": \{\
+            "addr": "10.111.10.214"\
+          \}\
+        \}\
+      \},\
+      "ipsec_tunnel_parameters": \{\
+        "peer_ip_address": \{\
+          "addr": "54.148.162.23"\
+        \},\
+        "tunnel_eps": [\
+          \{\
+            "node": "ip-10-0-220-213",\
+            "interface": "ves-io-securemesh-site-v2-kkawadkar-stg-aws-smg-single-01-network-ip-10-0-220-213-ens5-0",\
+            "local_tunnel_ip": "172.16.10.1/32",\
+            "remote_tunnel_ip": "172.16.10.2/32"\
+          \}\
+        ],\
+        "psk": "Redacted",\
+        "tunnel_mtu": 1370,\
+        "site_local_inside_network": \{\}\
+      \}\
+    \}\
+  \},\
+  "status_set": []\
+\}}

@@ -1,0 +1,29 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-ai
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-ai
+  template:
+    metadata:
+      labels:
+        app: arcadia-ai
+    spec:
+      containers:
+        - name: arcadia-users
+          image: sorinboiaf5/arcadia-ai:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+          env:
+            - name: LLM
+              value: ollama-aws.arcadiacrypto:11434
+            - name: STOCKTAPIHOST
+              value: arcadia-stock-transaction
+            - name: LLMMODEL
+              value: llama3.1:8b

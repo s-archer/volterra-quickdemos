@@ -1,0 +1,44 @@
+# Copy this file to variables.tf for local use.
+
+locals {
+  f5xc_api_url = format("https://%s.console.ves.volterra.io/api", var.f5xc_tenant)
+}
+
+variable "f5xc_lb_domains" {
+  description = "Domain name for the F5XC load balancer"
+  type        = string
+  default     = "sentence.example.com"
+}
+
+variable "f5xc_lb_vip" {
+  description = "Virtual IP address for the F5XC load balancer"
+  type        = string
+  default     = "192.168.10.10"
+}
+
+variable "f5xc_lb_port" {
+  description = "Port for the F5XC load balancer"
+  type        = number
+  default     = 80
+}
+
+variable "f5xc_origin_pool_name" {
+  description = "Origin pool name"
+  type        = string
+  default     = "sentence-frontend"
+}
+
+variable "f5xc_api_p12_file" {
+  type    = string
+  default = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "f5xc_tenant" {
+  type    = string
+  default = "example"
+}
+
+variable "f5xc_namespace" {
+  type    = string
+  default = "example-namespace"
+}

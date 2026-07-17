@@ -1,0 +1,114 @@
+# Copy this file to variables.tf for local use.
+# Keep real credentials and auth keys outside Git.
+
+variable "linux_server_count" {
+  type        = number
+  description = "Number of Linux servers to deploy"
+  default     = 2
+
+  validation {
+    condition     = var.linux_server_count >= 1 && floor(var.linux_server_count) == var.linux_server_count
+    error_message = "linux_server_count must be a whole number of 1 or greater."
+  }
+}
+
+variable "tailscale_auth_key" {
+  type        = string
+  description = "Optional Tailscale auth key. When set, the subnet-router VM will join the tailnet and advertise routes."
+  default     = ""
+  sensitive   = true
+}
+
+variable "tailscale_advertise_routes" {
+  type        = list(string)
+  description = "Routes advertised by the dedicated Tailscale subnet-router VM."
+  default     = ["10.99.0.0/16"]
+}
+
+variable "f5xc_ce_ipsec_peer_ip" {
+  type        = string
+  description = "F5 XC CE internal IP used as the IPsec peer."
+  default     = "10.0.12.60"
+}
+
+variable "f5xc_ce_ipsec_psk" {
+  type        = string
+  description = "Optional PSK for IPsec from the Tailscale subnet-router to the F5 XC CE. Leave empty to disable IPsec."
+  default     = ""
+  sensitive   = true
+}
+
+variable "f5xc_ce_ipsec_remote_routes" {
+  type        = list(string)
+  description = "Remote traffic selectors protected by the IPsec tunnel to F5 XC CE."
+  default     = ["10.99.0.0/16"]
+}
+
+variable "f5xc_ce_ipsec_interface_name" {
+  type        = string
+  description = "Linux XFRM interface name for the route-based IPsec tunnel to F5 XC CE."
+  default     = "ipsec0"
+}
+
+variable "f5xc_ce_ipsec_interface_id" {
+  type        = number
+  description = "XFRM interface ID used to bind the strongSwan child SA to the route-based IPsec interface."
+  default     = 42
+}
+
+variable "f5xc_ce_ipsec_local_tunnel_ip" {
+  type        = string
+  description = "SR-side tunnel IP configured on the route-based IPsec interface."
+  default     = "172.16.1.2/24"
+}
+
+variable "f5xc_ce_ipsec_remote_tunnel_ip" {
+  type        = string
+  description = "F5 XC CE-side tunnel IP reachable across the route-based IPsec interface."
+  default     = "172.16.1.1"
+}
+
+variable "f5xc_ce_ipsec_ike_proposals" {
+  type        = string
+  description = "strongSwan IKE proposal for the F5 XC CE IPsec tunnel."
+  default     = "aes256-sha256-modp2048"
+}
+
+variable "f5xc_ce_ipsec_esp_proposals" {
+  type        = string
+  description = "strongSwan ESP proposal for the F5 XC CE IPsec tunnel."
+  default     = "aes256-sha256-modp2048"
+}
+
+variable "f5xc_api_url" {
+  type        = string
+  description = "Volterra tenant API URL"
+  default     = "https://example.console.ves.volterra.io/api"
+}
+
+variable "f5xc_api_p12_file" {
+  type        = string
+  description = "Volterra tenant API certificate path. Override with a private local path."
+  default     = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "f5xc_namespace" {
+  type        = string
+  description = "Volterra app namespace where the object will be created. This cannot be system or shared ns."
+  default     = "example-namespace"
+}
+
+variable "region" {
+  description = "Region to be used in AWS"
+  default     = "eu-west-2"
+}
+
+variable "prefix" {
+  description = "Prefix used for naming objects created in AWS"
+  default     = "example-quickdemo-tf-"
+}
+
+variable "uk_se_name" {
+  description = "UK SE name tag"
+  default     = "example-owner"
+}

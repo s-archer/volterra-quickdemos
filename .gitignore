@@ -8,6 +8,9 @@ rendered_kubeconfig.yaml
 vars.tf
 /vars.tf
 /*/vars.tf
+variables.tf
+/variables.tf
+/*/variables.tf
 kubeconfig.yaml
 kube_config.yaml
 /kube_config.yaml

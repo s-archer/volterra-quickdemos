@@ -1,0 +1,25 @@
+# Copy this file to variables.tf for local use.
+
+variable "volt_api_url" {
+  type        = string
+  description = "Volterra tenant API URL"
+  default     = "https://example.console.ves.volterra.io/api"
+}
+
+variable "volt_api_p12_file" {
+  type        = string
+  description = "Volterra tenant API certificate path"
+  default     = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "volterra_namespace" {
+  type        = string
+  description = "Volterra namespace where the LB and origin will be created. This cannot be system or shared."
+  default     = "example-namespace"
+}
+
+variable "lb_domain" {
+  type        = string
+  description = "FQDN for the load balancer"
+  default     = "azure-rag.example.com"
+}

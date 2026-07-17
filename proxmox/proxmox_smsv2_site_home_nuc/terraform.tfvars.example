@@ -13,4 +13,7 @@ pm_pool             = ""
 f5xc_api_url        = "https://<tenant>.console.ves.volterra.io/api"
 f5xc_api_token      = "f5xc api token"
 f5xc_tenant         = "<tenant id>"
-f5xc_api_p12_file   = "<path to tenant.console.ves.volterra.io.api-creds.p12 file>
+f5xc_api_p12_file   = "<path to tenant.console.ves.volterra.io.api-creds.p12 file>"
+
+# Use to enable/disable BGP configuration for your proxmox site.
+bgp_enable          = true

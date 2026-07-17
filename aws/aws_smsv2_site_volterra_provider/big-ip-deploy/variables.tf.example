@@ -1,0 +1,54 @@
+# Copy this file to variables.tf for local use.
+
+variable "f5xc_api_url" {
+  type        = string
+  description = "Volterra tenant API URL"
+  default     = "https://example.console.ves.volterra.io/api"
+}
+
+variable "f5xc_api_p12_file" {
+  type        = string
+  description = "Volterra tenant API certificate path"
+  default     = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "f5xc_namespace" {
+  type        = string
+  description = "Volterra app namespace where the object will be created. This cannot be system or shared."
+  default     = "example-namespace"
+}
+
+variable "region" {
+  description = "AWS region to use"
+  default     = "eu-west-2"
+}
+
+variable "f5_ami_search_name" {
+  description = "Filter used to find the BIG-IP AMI for deployment"
+  default     = "F5*BIGIP-21.*Best*25Mbps*"
+}
+
+variable "prefix" {
+  description = "Prefix used for naming objects created in AWS"
+  default     = "example-quickdemo-tf-"
+}
+
+variable "uk_se_name" {
+  description = "Owner/team tag"
+  default     = "example-owner"
+}
+
+variable "hostname-f5" {
+  description = "Hostname for the BIG-IP, must be FQDN"
+  default     = "bigip-1.example.com"
+}
+
+variable "username" {
+  description = "BIG-IP username"
+  default     = "admin"
+}
+
+variable "instance_type" {
+  description = "AWS EC2 instance type"
+  default     = "m5.xlarge"
+}

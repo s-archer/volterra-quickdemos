@@ -4,7 +4,7 @@ locals {
 
 variable "prefix" {}
 
-# F5XC 
+# F5XC
 
 variable "f5xc_api_p12_file" {}
 variable "f5xc_api_url" {}
@@ -31,3 +31,9 @@ variable "pm_storage_pool" {
   default = "local-lvm"
 }
 variable "ssh_public_key" {}
+variable "outside_macaddr" {}
+variable "inside_macaddr" {}
+variable "bgp_enable" {
+  type    = bool
+  default = false
+}

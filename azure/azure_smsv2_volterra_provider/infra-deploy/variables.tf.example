@@ -1,0 +1,117 @@
+# Copy this file to variables.tf for local use.
+# Keep real credentials outside Git, for example in ../../../creds/creds.tfvars,
+# and apply with:
+#
+# terraform apply -var-file=../../../creds/creds.tfvars
+
+variable "subscription_id" {
+  description = "Azure subscription ID. Override with a private tfvars file."
+  type        = string
+  default     = "00000000-0000-0000-0000-000000000000"
+}
+
+variable "client_secret" {
+  description = "Azure service principal client secret. Override with a private tfvars file."
+  type        = string
+  sensitive   = true
+  default     = "example-client-secret"
+}
+
+variable "client_id" {
+  description = "Azure service principal client ID. Override with a private tfvars file."
+  type        = string
+  default     = "00000000-0000-0000-0000-000000000000"
+}
+
+variable "tenant_id" {
+  description = "Azure tenant ID. Override with a private tfvars file."
+  type        = string
+  default     = "00000000-0000-0000-0000-000000000000"
+}
+
+variable "f5xc_sms_node_count" {
+  description = "Number of nodes (sites) to deploy"
+  default     = 1
+}
+
+variable "owner" {
+  description = "Owner name tag"
+  default     = "example-owner"
+}
+
+variable "f5xc_api_url" {
+  type    = string
+  default = "https://example.console.ves.volterra.io/api"
+}
+
+variable "f5xc_api_p12_file" {
+  type        = string
+  description = "Volterra tenant API certificate path. Override with a private local path."
+  default     = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+}
+
+variable "prefix" {
+  description = "Prefix used for naming objects created in Azure and XC"
+  default     = "example-azure-smsv2"
+}
+
+locals {
+  f5xc_virtual_site_name = format("%s-site", var.prefix)
+  f5xc_sms_name          = format("%s-site-%s", var.prefix, random_id.f5xc_rebuild.hex)
+  f5xc_node_name_prefix  = format("%s-node-%s", var.prefix, random_id.f5xc_rebuild.hex)
+}
+
+variable "f5xc_sms_description" {
+  type    = string
+  default = "Example Azure SMS v2 site created with Terraform"
+}
+
+variable "location" {
+  description = "Azure location name"
+  default     = "uksouth"
+}
+
+variable "azs_short" {
+  description = "Assumes three AZs within region. Locals below format the full AZ names based on region."
+  default     = ["1", "2", "3"]
+}
+
+locals {
+  azs = [
+    for each_az in var.azs_short : format("%s%s", var.location, each_az)
+  ]
+}
+
+variable "f5xc_sms_instance_type" {
+  description = "Specifies the size of the virtual machine."
+  type        = string
+  default     = "Standard_DS4_v2"
+}
+
+variable "f5xc_sms_storage_account_type" {
+  description = "Defines the storage account type for SMS v2 VM disks."
+  default     = "Standard_LRS"
+}
+
+variable "uk_se_name" {
+  description = "Owner/team tag"
+  default     = "example-owner"
+}
+
+variable "f5xc_namespace" {
+  type        = string
+  description = "External k8s namespace where objects are created by XC if no namespace is included."
+  default     = "example-namespace"
+}
+
+variable "aks_k8s_namespace" {
+  type        = string
+  description = "AKS namespace used for XC discovery/output context."
+  default     = "azure-aks"
+}
+
+variable "eks_k8s_namespace" {
+  type        = string
+  description = "EKS namespace used for XC discovery/output context."
+  default     = "aws-eks"
+}

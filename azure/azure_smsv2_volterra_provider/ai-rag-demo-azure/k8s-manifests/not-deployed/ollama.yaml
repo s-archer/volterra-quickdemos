@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama
+  namespace: arcadiacrypto
+  labels:
+    app: ollama
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      containers:
+      - name: ollama
+        image: ollama/ollama:latest
+        ports:
+        - containerPort: 11434
+        # lifecycle:
+        #       postStart:
+        #         exec:
+        #           command: ["/bin/sh", "-c", "for i in $(seq 10); do ollama ps && break sleep 1 done; for model in llama3.2; do ollama pull \"$model\"; done"]
+        resources:
+          limits:
+            cpu: "8"
+            memory: "16Gi"
+          requests:
+            cpu: "4"
+            memory: "8Gi"
+        volumeMounts:
+        - name: ollama-data
+          mountPath: /root/.ollama
+      volumes:
+      - name: ollama-data
+        emptyDir: {}

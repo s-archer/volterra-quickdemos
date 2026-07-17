@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arcadia-db
+  namespace: arcadiacrypto
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: arcadia-db
+  template:
+    metadata:
+      labels:
+        app: arcadia-db
+    spec:
+      containers:
+        - name: arcadia-db
+          image: sorinboiaf5/arcadia-db:v1
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 27017
