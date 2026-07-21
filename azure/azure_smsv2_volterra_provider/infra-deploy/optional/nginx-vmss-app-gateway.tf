@@ -36,8 +36,10 @@ resource "azurerm_virtual_machine_scale_set" "vmss" {
     admin_username       = "azureuser"
     admin_password       = random_string.password.result
     custom_data = templatefile("${path.module}/templates/nginx.tpl", {
-      azure_region  = var.location
-      server_number = "scale-set"
+      azure_region       = var.location
+      server_number      = "scale-set"
+      tailscale_auth_key = var.tailscale_auth_key
+      tailscale_hostname = "${var.prefix}-nginx-scale-set"
     })
   }
 

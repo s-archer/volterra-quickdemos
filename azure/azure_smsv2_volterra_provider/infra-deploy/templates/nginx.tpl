@@ -1,5 +1,6 @@
 #cloud-config
 packages:
+ - curl
  - nginx
 
 write_files:
@@ -55,3 +56,9 @@ runcmd:
  - cp /tmp/nginx-index.html /var/www/html/index.html
  - cp /tmp/nginx-index.html /var/www/html/index.nginx-debian.html
  - systemctl restart nginx
+ - curl -fsSL https://tailscale.com/install.sh | sh
+%{ if tailscale_auth_key != "" ~}
+ - systemctl enable tailscaled
+ - systemctl restart tailscaled
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname '${tailscale_hostname}'
+%{ endif ~}

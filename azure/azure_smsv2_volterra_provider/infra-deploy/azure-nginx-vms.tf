@@ -57,8 +57,10 @@ resource "azurerm_linux_virtual_machine" "nginx" {
   ]
 
   custom_data = base64encode(templatefile("${path.module}/templates/nginx.tpl", {
-    azure_region  = var.location
-    server_number = count.index + 1
+    azure_region       = var.location
+    server_number      = count.index + 1
+    tailscale_auth_key = var.tailscale_auth_key
+    tailscale_hostname = "${var.prefix}-nginx-${count.index + 1}"
   }))
 
   source_image_reference {
