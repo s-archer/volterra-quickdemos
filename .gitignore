@@ -18,6 +18,7 @@ kube_config.yaml
 ssh-key.pub
 tmp/
 temp/
+**/engineering-frr-strongswan-examples/
 # Local .terraform directories
 **/.terraform/*
 .DS_Store
