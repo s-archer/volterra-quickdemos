@@ -44,6 +44,7 @@ write_files:
     <body>
       <main>
         <h1>NGINX on Azure</h1>
+        <p>server <strong>${server_number}</strong></p>
         <p>Serving from Azure region <strong>${azure_region}</strong></p>
       </main>
     </body>
