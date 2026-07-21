@@ -258,6 +258,9 @@ runcmd:
  - systemctl restart nginx
  - curl -fsSL https://tailscale.com/install.sh | sh
  - systemctl daemon-reload
+ - systemctl enable tailscaled
+ - systemctl restart tailscaled
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router
  - systemctl enable configure-xfrm-ipsec.service
  - systemctl start configure-xfrm-ipsec.service
  - systemctl enable frr

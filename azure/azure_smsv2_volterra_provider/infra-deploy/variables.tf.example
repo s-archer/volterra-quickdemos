@@ -4,6 +4,17 @@
 #
 # terraform apply -var-file=../../../creds/creds.tfvars
 
+
+# The following credential values should be populated from a separate creds.tfvars file,
+# stored outside of your repo folder. Use the -var-file=../../../creds/creds.tfvars
+# flag when applying config to use the values from your creds.tfvars file.
+#
+# subscription_id = "xxxxxxxxxxxx"
+# client_secret   = "xxxxxxxxxxxx"
+# client_id       = "xxxxxxxxxxxx"
+# tenant_id       = "xxxxxxxxxxxx"
+# tailscale_auth_key = "<tailscale-auth-key>"
+
 variable "subscription_id" {
   description = "Azure subscription ID. Override with a private tfvars file."
   type        = string
@@ -27,6 +38,13 @@ variable "tenant_id" {
   description = "Azure tenant ID. Override with a private tfvars file."
   type        = string
   default     = "00000000-0000-0000-0000-000000000000"
+}
+
+variable "tailscale_auth_key" {
+  description = "Reusable ephemeral Tailscale auth key for the subnet router. Override with a private tfvars file."
+  type        = string
+  sensitive   = true
+  default     = ""
 }
 
 variable "f5xc_sms_node_count" {

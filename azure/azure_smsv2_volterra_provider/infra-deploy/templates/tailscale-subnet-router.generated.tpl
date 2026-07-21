@@ -250,6 +250,4 @@ runcmd:
  - systemctl start configure-xfrm-ipsec.service
  - systemctl enable tailscaled
  - systemctl restart tailscaled
- # To fully reproduce the live host's Tailscale membership, authenticate the node
- # with a reusable/ephemeral auth key, for example:
- # - tailscale up --authkey '<REPLACE_WITH_TAILSCALE_AUTH_KEY' --hostname tailscale-subnet-router
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router
