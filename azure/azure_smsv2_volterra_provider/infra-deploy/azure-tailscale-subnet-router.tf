@@ -106,6 +106,7 @@ resource "azurerm_linux_virtual_machine" "tailscale_subnet_router" {
     remote_private_ip    = azurerm_network_interface.outside_nic[0].private_ip_address
     strongswan_ipsec_psk = random_password.tailscale_subnet_router_ipsec_psk.result
     tailscale_auth_key   = var.tailscale_auth_key
+    tailscale_tag        = var.tailscale_tag
   }))
 
   source_image_reference {

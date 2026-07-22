@@ -130,7 +130,7 @@ write_files:
      neighbor 172.16.1.1 update-source ipsec0
      !
      address-family ipv4 unicast
-      network 100.64.10.0/24
+      network 100.81.0.0/16
       neighbor 172.16.1.1 soft-reconfiguration inbound
      exit-address-family
     !
@@ -260,7 +260,7 @@ runcmd:
  - systemctl daemon-reload
  - systemctl enable tailscaled
  - systemctl restart tailscaled
- - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router --advertise-tags=tag:'${tailscale_tag}' --advertise-routes=192.168.0.0/16,172.16.0.0/16,100.64.0.0/16 --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
  - systemctl enable configure-xfrm-ipsec.service
  - systemctl start configure-xfrm-ipsec.service
  - systemctl enable frr
