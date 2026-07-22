@@ -60,5 +60,6 @@ runcmd:
 %{ if tailscale_auth_key != "" ~}
  - systemctl enable tailscaled
  - systemctl restart tailscaled
- - tailscale up --authkey '${tailscale_auth_key}' --hostname '${tailscale_hostname}'
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname '${tailscale_hostname}' --accept-routes=true --accept-dns=true
+
 %{ endif ~}
