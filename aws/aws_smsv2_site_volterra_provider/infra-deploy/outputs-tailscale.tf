@@ -13,3 +13,8 @@ output "tailscale-router-internal" {
 output "tailscale-advertise-routes" {
   value = local.tailscale_advertise_routes
 }
+
+output "tailscale-router-ipsec-psk" {
+  value     = local.tailscale_subnet_router_ipsec_psk
+  sensitive = true
+}
