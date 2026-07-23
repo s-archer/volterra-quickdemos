@@ -4,6 +4,8 @@ set -euxo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
 HOSTNAME_VALUE="${hostname}"
+SERVER_NUMBER="${server_number}"
+AWS_REGION="${aws_region}"
 MGMT_MAC="$(echo "${mgmt_mac}" | tr '[:upper:]' '[:lower:]')"
 INTERNAL_MAC="$(echo "${internal_mac}" | tr '[:upper:]' '[:lower:]')"
 MGMT_GATEWAY="${mgmt_gateway}"
@@ -12,6 +14,7 @@ INTERNAL_VPC_CIDR="${internal_vpc_cidr}"
 INTERNAL_PRIVATE_IP="${internal_private_ip}"
 ENABLE_TAILSCALE_SUBNET_ROUTER="${enable_tailscale_subnet_router}"
 TAILSCALE_AUTH_KEY="${tailscale_auth_key}"
+TAILSCALE_TAG="${tailscale_tag}"
 TAILSCALE_ADVERTISE_ROUTES="${tailscale_advertise_routes}"
 INTERNAL_EXTRA_ROUTES="${internal_extra_routes}"
 ENABLE_F5XC_CE_IPSEC="${enable_f5xc_ce_ipsec}"
@@ -131,31 +134,60 @@ apt-get install -y \
   curl \
   gnupg \
   nano \
+  nginx \
   iputils-ping \
   traceroute \
   charon-systemd \
   strongswan \
   strongswan-swanctl
 
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg \
-  | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-chmod a+r /etc/apt/keyrings/docker.gpg
+cat >/var/www/html/index.html <<EOF
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AWS Region: $AWS_REGION</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #1f2933;
+      background: #f4f7fb;
+    }
+    main {
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 {
+      margin: 0 0 1rem;
+      font-size: 2.5rem;
+    }
+    p {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    strong {
+      color: #0067b8;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>NGINX on AWS</h1>
+    <p>server <strong>$SERVER_NUMBER</strong></p>
+    <p>Serving from AWS region <strong>$AWS_REGION</strong></p>
+  </main>
+</body>
+</html>
+EOF
 
-. /etc/os-release
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $${VERSION_CODENAME} stable" \
-  > /etc/apt/sources.list.d/docker.list
-
-apt-get update
-apt-get install -y \
-  docker-ce \
-  docker-ce-cli \
-  containerd.io \
-  docker-buildx-plugin \
-  docker-compose-plugin
-
-systemctl enable --now docker
+cp /var/www/html/index.html /var/www/html/index.nginx-debian.html
+systemctl enable --now nginx
 
 if [ "$ENABLE_F5XC_CE_IPSEC" = "true" ]; then
   if [ -z "$F5XC_CE_IPSEC_PSK" ]; then
@@ -295,27 +327,17 @@ if [ -n "$TAILSCALE_AUTH_KEY" ]; then
     tailscale up \
       --authkey="$TAILSCALE_AUTH_KEY" \
       --hostname="$HOSTNAME_VALUE" \
-      --advertise-routes="$TAILSCALE_ADVERTISE_ROUTES"
+      --advertise-tags="tag:$TAILSCALE_TAG" \
+      --advertise-routes="$TAILSCALE_ADVERTISE_ROUTES" \
+      --advertise-exit-node=false \
+      --accept-dns=false \
+      --snat-subnet-routes=false \
+      --netfilter-mode=off
   else
     tailscale up \
       --authkey="$TAILSCALE_AUTH_KEY" \
       --hostname="$HOSTNAME_VALUE" \
-      --accept-routes
+      --accept-routes=true \
+      --accept-dns=true
   fi
 fi
-
-useradd -m -s /bin/bash debug || true
-echo 'debug:debug' | chpasswd
-usermod -aG docker debug
-
-mkdir -p /opt/nginx-demo
-cat > /opt/nginx-demo/compose.yml <<'EOF'
-services:
-  web:
-    image: nginxdemos/hello
-    network_mode: host
-    restart: always
-    command: [nginx-debug, "-g", "daemon off;"]
-EOF
-
-docker compose -f /opt/nginx-demo/compose.yml up -d

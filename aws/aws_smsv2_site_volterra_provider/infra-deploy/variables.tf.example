@@ -88,3 +88,88 @@ variable "f5xc_api_p12_file" {
 variable "sa_name" {
   default = "f5xc"
 }
+
+variable "linux_server_count" {
+  type        = number
+  description = "Number of Linux NGINX servers to deploy"
+  default     = 2
+
+  validation {
+    condition     = var.linux_server_count >= 1 && floor(var.linux_server_count) == var.linux_server_count
+    error_message = "linux_server_count must be a whole number of 1 or greater."
+  }
+}
+
+variable "tailscale_auth_key" {
+  type        = string
+  description = "Optional Tailscale auth key. When set, Linux VMs will join the tailnet."
+  default     = ""
+  sensitive   = true
+}
+
+variable "tailscale_tag" {
+  type        = string
+  description = "Tailscale ACL tag advertised by the subnet router."
+  default     = "tsr-aws"
+}
+
+variable "tailscale_advertise_routes" {
+  type        = list(string)
+  description = "Routes advertised by the dedicated Tailscale subnet-router VM."
+  default     = ["10.99.0.0/16"]
+}
+
+variable "f5xc_ce_ipsec_peer_ip" {
+  type        = string
+  description = "Optional override for the F5 XC CE IPsec peer IP. Leave empty to use the CE outside ENI IP."
+  default     = ""
+}
+
+variable "f5xc_ce_ipsec_psk" {
+  type        = string
+  description = "Optional PSK override for IPsec from the Tailscale subnet-router to the F5 XC CE. Leave empty to generate one."
+  default     = ""
+  sensitive   = true
+}
+
+variable "f5xc_ce_ipsec_remote_routes" {
+  type        = list(string)
+  description = "Remote traffic selectors protected by the IPsec tunnel to F5 XC CE."
+  default     = ["10.99.0.0/16"]
+}
+
+variable "f5xc_ce_ipsec_interface_name" {
+  type        = string
+  description = "Linux XFRM interface name for the route-based IPsec tunnel to F5 XC CE."
+  default     = "ipsec0"
+}
+
+variable "f5xc_ce_ipsec_interface_id" {
+  type        = number
+  description = "XFRM interface ID used to bind the strongSwan child SA to the route-based IPsec interface."
+  default     = 42
+}
+
+variable "f5xc_ce_ipsec_local_tunnel_ip" {
+  type        = string
+  description = "SR-side tunnel IP configured on the route-based IPsec interface."
+  default     = "172.16.1.2/24"
+}
+
+variable "f5xc_ce_ipsec_remote_tunnel_ip" {
+  type        = string
+  description = "F5 XC CE-side tunnel IP reachable across the route-based IPsec interface."
+  default     = "172.16.1.1"
+}
+
+variable "f5xc_ce_ipsec_ike_proposals" {
+  type        = string
+  description = "strongSwan IKE proposal for the F5 XC CE IPsec tunnel."
+  default     = "aes256-sha256-modp2048"
+}
+
+variable "f5xc_ce_ipsec_esp_proposals" {
+  type        = string
+  description = "strongSwan ESP proposal for the F5 XC CE IPsec tunnel."
+  default     = "aes256-sha256-modp2048"
+}

@@ -18,14 +18,6 @@ resource "aws_eks_cluster" "eks" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "eks-in" {
-  security_group_id = aws_eks_cluster.eks.vpc_config[0].cluster_security_group_id
-
-  cidr_ipv4   = "10.0.0.0/16"
-  ip_protocol = "-1"
-  description = "allow any inbound to cluster"
-}
-
 resource "aws_eks_node_group" "eks-nodes" {
   cluster_name    = aws_eks_cluster.eks.name
   node_group_name = "${var.prefix}nodes"
