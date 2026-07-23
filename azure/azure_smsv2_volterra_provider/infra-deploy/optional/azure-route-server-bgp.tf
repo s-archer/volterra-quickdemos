@@ -1,5 +1,5 @@
 resource "volterra_bgp" "bgp-node" {
-  name      = format("%s-bgp", local.f5xc_sms_name)
+  name      = format("%s-bgp", volterra_securemesh_site_v2.site[count.index].name)
   namespace = "system"
 
   bgp_parameters {

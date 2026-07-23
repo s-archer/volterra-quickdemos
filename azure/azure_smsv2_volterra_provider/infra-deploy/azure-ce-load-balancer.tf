@@ -1,5 +1,5 @@
 resource "azurerm_lb" "lb" {
-  name                = format("%s-lb-%s", var.prefix, random_id.id.hex)
+  name                = format("%s-lb", var.prefix)
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = "Standard"

@@ -1,12 +1,13 @@
 resource "volterra_external_connector" "tailscale_azure" {
-  name        = volterra_securemesh_site_v2.site[0].name
+  name        = volterra_securemesh_site_v2.site[count.index].name
+  count       = var.f5xc_sms_node_count
   namespace   = "system"
   description = "Using SLO!!  Reminder to update to SLI"
 
   ce_site_reference {
-    name      = volterra_securemesh_site_v2.site[0].name
+    name      = volterra_securemesh_site_v2.site[count.index].name
     namespace = "system"
-    tenant    = "f5-emea-ent-bceuutam"
+    tenant    = var.f5xc_tenant
   }
 
   ipsec {
@@ -41,8 +42,8 @@ resource "volterra_external_connector" "tailscale_azure" {
       }
 
       tunnel_eps {
-        node             = "${local.f5xc_node_name_prefix}-0"
-        interface        = format("ves-io-securemesh-site-v2-%s-network-%s-eth0-0", volterra_securemesh_site_v2.site[0].name, "${local.f5xc_node_name_prefix}-0")
+        node             = format("node-%s", count.index)
+        interface        = format("ves-io-securemesh-site-v2-%s-network-%s-eth0-0", volterra_securemesh_site_v2.site[0].name, format("node-%s", count.index))
         local_tunnel_ip  = "172.16.1.1/24"
         remote_tunnel_ip = "172.16.1.2/24"
       }
@@ -51,7 +52,7 @@ resource "volterra_external_connector" "tailscale_azure" {
         refs {
           name      = "arch-vodafone"
           namespace = "system"
-          tenant    = "f5-emea-ent-bceuutam"
+          tenant    = var.f5xc_tenant
         }
       }
     }
@@ -59,7 +60,8 @@ resource "volterra_external_connector" "tailscale_azure" {
 }
 
 resource "volterra_bgp" "tailscale_azure" {
-  name      = volterra_securemesh_site_v2.site[0].name
+  name      = volterra_securemesh_site_v2.site[count.index].name
+  count     = var.f5xc_sms_node_count
   namespace = "system"
 
   bgp_parameters {
@@ -90,9 +92,9 @@ resource "volterra_bgp" "tailscale_azure" {
       }
 
       interface {
-        tenant    = "f5-emea-ent-bceuutam"
+        tenant    = var.f5xc_tenant
         namespace = "system"
-        name      = format("ves-io-external-connector-%s", volterra_external_connector.tailscale_azure.name)
+        name      = format("ves-io-external-connector-%s", volterra_external_connector.tailscale_azure[count.index].name)
       }
     }
   }
@@ -103,7 +105,7 @@ resource "volterra_bgp" "tailscale_azure" {
       network_type         = "VIRTUAL_NETWORK_SITE_LOCAL"
 
       ref {
-        name      = volterra_securemesh_site_v2.site[0].name
+        name      = volterra_securemesh_site_v2.site[count.index].name
         namespace = "system"
       }
     }

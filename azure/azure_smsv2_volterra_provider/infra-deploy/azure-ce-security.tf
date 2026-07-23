@@ -5,9 +5,10 @@ data "http" "myip" {
 # Create the Network Security group Module to associate with BIGIP-outside-Nic
 #
 module "outside-network-security-group" {
+  depends_on          = [azurerm_resource_group.rg]
   source              = "Azure/network-security-group/azurerm"
   resource_group_name = azurerm_resource_group.rg.name
-  security_group_name = format("%s-outside-nsg-%s", var.prefix, random_id.id.hex)
+  security_group_name = format("%s-outside-nsg", var.prefix)
   tags = {
     environment = "dev"
     costcenter  = "terraform"
@@ -18,9 +19,10 @@ module "outside-network-security-group" {
 # Create the Network Security group Module to associate with BIGIP-inside-Nic
 #
 module "inside-network-security-group-public" {
+  depends_on          = [azurerm_resource_group.rg]
   source              = "Azure/network-security-group/azurerm"
   resource_group_name = azurerm_resource_group.rg.name
-  security_group_name = format("%s-inside-nsg-%s", var.prefix, random_id.id.hex)
+  security_group_name = format("%s-inside-nsg", var.prefix)
   tags = {
     environment = "dev"
     costcenter  = "terraform"
@@ -38,7 +40,7 @@ resource "azurerm_network_security_rule" "outside_allow_https" {
   destination_address_prefix  = "*"
   source_address_prefixes     = ["0.0.0.0/0"]
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = format("%s-outside-nsg-%s", var.prefix, random_id.id.hex)
+  network_security_group_name = format("%s-outside-nsg", var.prefix)
   depends_on                  = [module.outside-network-security-group]
 }
 
@@ -54,7 +56,7 @@ resource "azurerm_network_security_rule" "outside_allow_ssh" {
   source_address_prefixes    = ["${data.http.myip.response_body}/32"]
   # source_address_prefixes     = ["90.255.235.127/32"]
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = format("%s-outside-nsg-%s", var.prefix, random_id.id.hex)
+  network_security_group_name = format("%s-outside-nsg", var.prefix)
   depends_on                  = [module.outside-network-security-group]
 }
 
@@ -70,7 +72,7 @@ resource "azurerm_network_security_rule" "outside_allow_ipsec" {
   # source_address_prefixes     = ["${data.http.myip.response_body}/32"]
   source_address_prefixes     = ["0.0.0.0/0"]
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = format("%s-outside-nsg-%s", var.prefix, random_id.id.hex)
+  network_security_group_name = format("%s-outside-nsg", var.prefix)
   depends_on                  = [module.outside-network-security-group]
 }
 
@@ -85,7 +87,7 @@ resource "azurerm_network_security_rule" "inside_allow_https" {
   destination_address_prefix  = "192.168.0.0/16"
   source_address_prefixes     = ["192.168.0.0/16"]
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = format("%s-inside-nsg-%s", var.prefix, random_id.id.hex)
+  network_security_group_name = format("%s-inside-nsg", var.prefix)
   depends_on                  = [module.inside-network-security-group-public]
 }
 
@@ -100,6 +102,6 @@ resource "azurerm_network_security_rule" "inside_allow_bgp" {
   destination_address_prefix  = "192.168.0.0/16"
   source_address_prefixes     = ["192.168.0.0/16"]
   resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = format("%s-inside-nsg-%s", var.prefix, random_id.id.hex)
+  network_security_group_name = format("%s-inside-nsg", var.prefix)
   depends_on                  = [module.inside-network-security-group-public]
 }

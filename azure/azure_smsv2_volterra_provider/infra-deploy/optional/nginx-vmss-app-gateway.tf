@@ -84,7 +84,7 @@ resource "azurerm_subnet" "app-gw" {
 
 resource "azurerm_public_ip" "nginx-app-gw" {
   name                = "nginx-app-gw"
-  domain_name_label   = "${var.prefix}-${random_id.id.hex}-nginx"
+  domain_name_label   = "${var.prefix}-nginx"
   resource_group_name = azurerm_resource_group.rg.name
   location            = azurerm_resource_group.rg.location
   allocation_method   = "Static"

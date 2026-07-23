@@ -21,7 +21,48 @@ resource "volterra_securemesh_site_v2" "site" {
   }
 
   azure {
-    not_managed {}
+    not_managed {
+      node_list {
+
+        hostname = format("node-%s", count.index)
+        public_ip = azurerm_public_ip.outside_public_ip[count.index].ip_address
+        type     = "Control"
+
+        interface_list {
+          name        = "eth0"
+          priority    = 0
+          mtu         = 0
+          dhcp_client = true
+          
+          ethernet_interface {
+            device = "eth0"
+            mac    = ""
+          }
+
+          network_option {
+            site_local_network        = true
+            site_local_inside_network = false
+          }
+        }
+
+        interface_list {
+          name        = "eth1"
+          priority    = 0
+          mtu         = 0
+          dhcp_client = true
+          
+          ethernet_interface {
+            device = "eth1"
+            mac    = ""
+          }
+
+          network_option {
+            site_local_network        = false
+            site_local_inside_network = true
+          }    
+        }
+      }
+    }
   }
 
   local_vrf {
@@ -60,7 +101,7 @@ resource "volterra_securemesh_site_v2" "site" {
 resource "volterra_token" "smsv2-token" {
   count      = var.f5xc_sms_node_count
   depends_on = [volterra_securemesh_site_v2.site]
-  name       = format("%s-token-%s", local.f5xc_sms_name, count.index)
+  name       = volterra_securemesh_site_v2.site[count.index].name
   namespace  = "system"
   type       = 1
   site_name  = volterra_securemesh_site_v2.site[count.index].name
@@ -69,7 +110,7 @@ resource "volterra_token" "smsv2-token" {
 resource "azurerm_virtual_machine" "f5xc-nodes" {
   count                        = var.f5xc_sms_node_count
   depends_on                   = [azurerm_network_interface_security_group_association.outside_security, azurerm_network_interface_security_group_association.inside_security]
-  name                         = "${local.f5xc_node_name_prefix}-${count.index}"
+  name                         = volterra_securemesh_site_v2.site[count.index].name
   location                     = var.location
   zones                        = [var.azs_short[count.index]]
   resource_group_name          = azurerm_resource_group.rg.name
@@ -99,18 +140,18 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
   }
 
   storage_os_disk {
-    name              = "${local.f5xc_node_name_prefix}-${count.index}"
+    name              = volterra_securemesh_site_v2.site[count.index].name
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = var.f5xc_sms_storage_account_type
   }
 
   os_profile {
-    computer_name  = "${local.f5xc_node_name_prefix}-${count.index}"
+    computer_name  = format("node-%s", count.index)
     admin_username = "volterra-admin"
     admin_password = random_string.password.result
     custom_data = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
-      cluster_name = format("%s-node-%s", local.f5xc_sms_name, count.index),
+      cluster_name = volterra_securemesh_site_v2.site[count.index].name,
       # token        = restful_resource.token[count.index].output.spec.content
       token = volterra_token.smsv2-token[count.index].id
     }))
@@ -121,7 +162,7 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
   }
 
   tags = {
-    Name   = "${local.f5xc_node_name_prefix}-${count.index}"
+    Name   = volterra_securemesh_site_v2.site[count.index].name
     source = "terraform"
     owner  = var.owner
   }

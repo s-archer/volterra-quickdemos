@@ -82,8 +82,7 @@ variable "prefix" {
 
 locals {
   f5xc_virtual_site_name = format("%s-site", var.prefix)
-  f5xc_sms_name          = format("%s-site-%s", var.prefix, random_id.f5xc_rebuild.hex)
-  f5xc_node_name_prefix  = format("%s-node-%s", var.prefix, random_id.f5xc_rebuild.hex)
+  f5xc_sms_name          = format("%s-site-%s", var.prefix, random_id.id.hex)
 }
 
 variable "f5xc_sms_description" {
