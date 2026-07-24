@@ -11,6 +11,11 @@ resource "volterra_securemesh_site_v2" "site" {
     # (volterra_known_label_key.key.key) = (volterra_known_label.label.value)
     ("virtual-site-terraform") = (volterra_known_label.label.value)
     "ves.io/provider"          = "ves-io-AZURE"
+    "arch"                     = "site-mesh-group"
+  }
+
+  site_mesh_group_on_slo {
+    sm_connection_public_ip = true
   }
 
   re_select {
@@ -150,9 +155,8 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
     computer_name  = format("node-%s", count.index)
     admin_username = "volterra-admin"
     admin_password = random_string.password.result
-    custom_data = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
+    custom_data    = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
       cluster_name = volterra_securemesh_site_v2.site[count.index].name,
-      # token        = restful_resource.token[count.index].output.spec.content
       token = volterra_token.smsv2-token[count.index].id
     }))
   }
@@ -168,7 +172,9 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
   }
 
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [
+      tags
+    ]
   }
 }
 
@@ -244,24 +250,6 @@ resource "azurerm_network_interface" "inside_nic" {
 #     Name   = "${var.prefix}-other-nic-${count.index}"
 #     source = "terraform"
 #   }
-# }
-
-resource "azurerm_network_interface_security_group_association" "outside_security" {
-  count                     = var.f5xc_sms_node_count
-  network_interface_id      = azurerm_network_interface.outside_nic[count.index].id
-  network_security_group_id = module.outside-network-security-group.network_security_group_id
-}
-
-resource "azurerm_network_interface_security_group_association" "inside_security" {
-  count                     = var.f5xc_sms_node_count
-  network_interface_id      = azurerm_network_interface.inside_nic[count.index].id
-  network_security_group_id = module.inside-network-security-group-public.network_security_group_id
-}
-
-# resource "azurerm_network_interface_security_group_association" "other_security" {
-#   count                     = var.f5xc_sms_node_count
-#   network_interface_id      = azurerm_network_interface.other_nic[count.index].id
-#   network_security_group_id = module.inside-network-security-group-public.network_security_group_id
 # }
 
 # Unhash the following block if you want to manage your own key, but make sure you change the `key` value

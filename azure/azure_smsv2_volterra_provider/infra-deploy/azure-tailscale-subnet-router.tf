@@ -38,51 +38,6 @@ resource "azurerm_network_interface" "tailscale_subnet_router" {
   }
 }
 
-resource "azurerm_network_security_group" "tailscale_subnet_router" {
-  name                = "${var.prefix}-tailscale-subnet-router-nsg"
-  location            = var.location
-  resource_group_name = azurerm_resource_group.rg.name
-
-  tags = {
-    Name   = "tailscale-subnet-router"
-    Source = "terraform"
-    Owner  = var.uk_se_name
-  }
-}
-
-resource "azurerm_network_security_rule" "tailscale_subnet_router_allow_ssh" {
-  name                        = "Allow_ssh"
-  priority                    = 201
-  direction                   = "Inbound"
-  access                      = "Allow"
-  protocol                    = "Tcp"
-  source_port_range           = "*"
-  destination_port_range      = "22"
-  destination_address_prefix  = "*"
-  source_address_prefixes     = ["${data.http.myip.response_body}/32"]
-  resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.tailscale_subnet_router.name
-}
-
-resource "azurerm_network_security_rule" "tailscale_subnet_router_allow_all_egress" {
-  name                        = "Allow_all_egress"
-  priority                    = 200
-  direction                   = "Outbound"
-  access                      = "Allow"
-  protocol                    = "*"
-  source_port_range           = "*"
-  destination_port_range      = "*"
-  source_address_prefix       = "*"
-  destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.rg.name
-  network_security_group_name = azurerm_network_security_group.tailscale_subnet_router.name
-}
-
-resource "azurerm_network_interface_security_group_association" "tailscale_subnet_router" {
-  network_interface_id      = azurerm_network_interface.tailscale_subnet_router.id
-  network_security_group_id = azurerm_network_security_group.tailscale_subnet_router.id
-}
-
 resource "azurerm_linux_virtual_machine" "tailscale_subnet_router" {
   name                = "${var.prefix}-tailscale-subnet-router-vm"
   location            = var.location
