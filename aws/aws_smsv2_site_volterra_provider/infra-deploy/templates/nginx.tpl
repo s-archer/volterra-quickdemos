@@ -123,6 +123,7 @@ apt-get install -y \
   iputils-ping \
   nano \
   nginx \
+  tcpdump \
   traceroute
 
 cat >/var/www/html/index.html <<EOF

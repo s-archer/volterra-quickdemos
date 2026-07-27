@@ -58,10 +58,12 @@ resource "azurerm_linux_virtual_machine" "tailscale_subnet_router" {
     azure_region     = var.location
     local_private_ip = azurerm_network_interface.tailscale_subnet_router.private_ip_address
     # remote_private_ip    = azurerm_network_interface.inside_nic[0].private_ip_address
-    remote_private_ip    = azurerm_network_interface.outside_nic[0].private_ip_address
-    strongswan_ipsec_psk = random_password.tailscale_subnet_router_ipsec_psk.result
-    tailscale_auth_key   = var.tailscale_auth_key
-    tailscale_tag        = var.tailscale_tag
+    remote_private_ip          = azurerm_network_interface.outside_nic[0].private_ip_address
+    strongswan_ipsec_psk       = random_password.tailscale_subnet_router_ipsec_psk.result
+    tailscale_auth_key         = var.tailscale_auth_key
+    tailscale_tag              = var.tailscale_tag
+    tailscale_advertise_routes = join(",", var.remote_tailnet_routes)
+    bgp_export_route_list      = var.local_tailnet_routes
   }))
 
   source_image_reference {

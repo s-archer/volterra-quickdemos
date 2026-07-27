@@ -1,343 +1,404 @@
-#!/bin/bash
-set -euxo pipefail
+#cloud-config
+package_update: true
+packages:
+ - curl
+ - frr
+ - libcharon-extra-plugins
+ - libstrongswan-extra-plugins
+ - nginx
+ - strongswan
+ - strongswan-swanctl
+ - tcpdump
 
-export DEBIAN_FRONTEND=noninteractive
+write_files:
+- path: /tmp/nginx-index.html
+  owner: root:root
+  permissions: '0644'
+  content: |
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Tailscale Subnet Router: ${aws_region}</title>
+      <style>
+        body {
+          margin: 0;
+          min-height: 100vh;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: Arial, Helvetica, sans-serif;
+          color: #1f2933;
+          background: #f4f7fb;
+        }
+        main {
+          text-align: center;
+          padding: 2rem;
+        }
+        h1 {
+          margin: 0 0 1rem;
+          font-size: 2.5rem;
+        }
+        p {
+          margin: 0;
+          font-size: 1.25rem;
+        }
+        strong {
+          color: #0067b8;
+        }
+      </style>
+    </head>
+    <body>
+      <main>
+        <h1>Tailscale Subnet Router</h1>
+        <p>Serving from AWS region <strong>${aws_region}</strong></p>
+      </main>
+    </body>
+    </html>
+- path: /usr/local/sbin/configure-aws-routing.sh
+  owner: root:root
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    set -euo pipefail
+    exec > >(tee -a /var/log/configure-aws-routing.log) 2>&1
+    set -x
+    trap 'echo "configure-aws-routing failed at line $LINENO with exit code $?"' ERR
 
-HOSTNAME_VALUE="${hostname}"
-SERVER_NUMBER="${server_number}"
-AWS_REGION="${aws_region}"
-MGMT_MAC="$(echo "${mgmt_mac}" | tr '[:upper:]' '[:lower:]')"
-INTERNAL_MAC="$(echo "${internal_mac}" | tr '[:upper:]' '[:lower:]')"
-MGMT_GATEWAY="${mgmt_gateway}"
-INTERNAL_GATEWAY="${internal_gateway}"
-INTERNAL_VPC_CIDR="${internal_vpc_cidr}"
-INTERNAL_PRIVATE_IP="${internal_private_ip}"
-ENABLE_TAILSCALE_SUBNET_ROUTER="${enable_tailscale_subnet_router}"
-TAILSCALE_AUTH_KEY="${tailscale_auth_key}"
-TAILSCALE_TAG="${tailscale_tag}"
-TAILSCALE_ADVERTISE_ROUTES="${tailscale_advertise_routes}"
-INTERNAL_EXTRA_ROUTES="${internal_extra_routes}"
-ENABLE_F5XC_CE_IPSEC="${enable_f5xc_ce_ipsec}"
-F5XC_CE_IPSEC_PEER_IP="${f5xc_ce_ipsec_peer_ip}"
-F5XC_CE_IPSEC_PSK="${f5xc_ce_ipsec_psk}"
-F5XC_CE_IPSEC_REMOTE_ROUTES="${f5xc_ce_ipsec_remote_routes}"
-F5XC_CE_IPSEC_INTERFACE_NAME="${f5xc_ce_ipsec_interface_name}"
-F5XC_CE_IPSEC_INTERFACE_ID="${f5xc_ce_ipsec_interface_id}"
-F5XC_CE_IPSEC_LOCAL_TUNNEL_IP="${f5xc_ce_ipsec_local_tunnel_ip}"
-F5XC_CE_IPSEC_REMOTE_TUNNEL_IP="${f5xc_ce_ipsec_remote_tunnel_ip}"
-F5XC_CE_IPSEC_IKE_PROPOSALS="${f5xc_ce_ipsec_ike_proposals}"
-F5XC_CE_IPSEC_ESP_PROPOSALS="${f5xc_ce_ipsec_esp_proposals}"
+    MGMT_MAC="$(echo "${mgmt_mac}" | tr '[:upper:]' '[:lower:]')"
+    INTERNAL_MAC="$(echo "${internal_mac}" | tr '[:upper:]' '[:lower:]')"
+    MGMT_GATEWAY="${mgmt_gateway}"
+    INTERNAL_GATEWAY="${internal_gateway}"
+    INTERNAL_VPC_CIDR="${internal_vpc_cidr}"
+    INTERNAL_PRIVATE_IP="${internal_private_ip}"
+    INTERNAL_EXTRA_ROUTES="${internal_extra_routes}"
 
-hostnamectl set-hostname "$HOSTNAME_VALUE"
+    iface_for_mac() {
+      local mac="$1"
+      local iface
 
-iface_for_mac() {
-  local mac="$1"
-  local iface
+      for iface_path in /sys/class/net/*; do
+        iface="$(basename "$iface_path")"
+        if [ "$iface" = "lo" ]; then
+          continue
+        fi
 
-  for iface_path in /sys/class/net/*; do
-    iface="$(basename "$iface_path")"
-    if [ "$iface" = "lo" ]; then
-      continue
+        if [ "$(cat "$iface_path/address")" = "$mac" ]; then
+          echo "$iface"
+          return 0
+        fi
+      done
+
+      return 1
+    }
+
+    for attempt in $(seq 1 60); do
+      MGMT_IF="$(iface_for_mac "$MGMT_MAC" || true)"
+      INTERNAL_IF="$(iface_for_mac "$INTERNAL_MAC" || true)"
+
+      if [ -n "$MGMT_IF" ] && [ -n "$INTERNAL_IF" ]; then
+        break
+      fi
+
+      sleep 2
+    done
+
+    if [ -z "$MGMT_IF" ] || [ -z "$INTERNAL_IF" ]; then
+      echo "Could not map mgmt/internal interfaces from ENI MAC addresses" >&2
+      exit 1
     fi
 
-    if [ "$(cat "$iface_path/address")" = "$mac" ]; then
-      echo "$iface"
-      return 0
+    ip route del default dev "$INTERNAL_IF" || true
+    ip route replace default via "$MGMT_GATEWAY" dev "$MGMT_IF" metric 100
+    ip route replace "$INTERNAL_VPC_CIDR" via "$INTERNAL_GATEWAY" dev "$INTERNAL_IF" src "$INTERNAL_PRIVATE_IP" metric 50
+
+    for route in $INTERNAL_EXTRA_ROUTES; do
+      ip route replace "$route" via "$INTERNAL_GATEWAY" dev "$INTERNAL_IF" src "$INTERNAL_PRIVATE_IP" metric 40
+    done
+
+    printf '%s\n' "$INTERNAL_IF" >/run/aws-internal-interface
+- path: /etc/systemd/system/configure-aws-routing.service
+  owner: root:root
+  permissions: '0644'
+  content: |
+    [Unit]
+    Description=Configure AWS multi-interface routing
+    After=network-online.target
+    Wants=network-online.target
+
+    [Service]
+    Type=oneshot
+    ExecStart=/usr/local/sbin/configure-aws-routing.sh
+    RemainAfterExit=yes
+
+    [Install]
+    WantedBy=multi-user.target
+- path: /usr/local/sbin/configure-xfrm-ipsec.sh
+  owner: root:root
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    set -euo pipefail
+    exec > >(tee -a /var/log/configure-xfrm-ipsec.log) 2>&1
+    set -x
+    trap 'echo "configure-xfrm-ipsec failed at line $LINENO with exit code $?"' ERR
+
+    LOCAL_PRIVATE_IP="${internal_private_ip}"
+    REMOTE_PRIVATE_IP="${f5xc_ce_ipsec_peer_ip}"
+    IPSEC_PSK="${f5xc_ce_ipsec_psk}"
+    BGP_EXPORT_ROUTES="${bgp_export_routes}"
+
+    modprobe xfrm_interface
+
+    if ip link show ipsec0 >/dev/null 2>&1; then
+      ip link delete ipsec0
     fi
-  done
 
-  return 1
-}
+    UNDERLAY_IF="$(cat /run/aws-internal-interface)"
+    ip link add ipsec0 type xfrm dev "$UNDERLAY_IF" if_id 42
+    ip link set ipsec0 up mtu 1370
+    ip addr replace 172.16.1.2/24 dev ipsec0
 
-for attempt in $(seq 1 60); do
-  MGMT_IF="$(iface_for_mac "$MGMT_MAC" || true)"
-  INTERNAL_IF="$(iface_for_mac "$INTERNAL_MAC" || true)"
+    sysctl -w net.ipv4.ip_forward=1
+    sysctl -w net.ipv4.conf.ipsec0.rp_filter=0
+    sysctl -w net.ipv4.conf.ipsec0.disable_policy=0
+    sysctl -w net.ipv4.conf.ipsec0.disable_xfrm=0
 
-  if [ -n "$MGMT_IF" ] && [ -n "$INTERNAL_IF" ]; then
-    break
-  fi
+    install -d -o frr -g frr -m 0750 /etc/frr
+    cat >/etc/frr/daemons <<EOF
+    zebra=yes
+    bgpd=yes
+    ospfd=no
+    ospf6d=no
+    ripd=no
+    ripngd=no
+    isisd=no
+    pimd=no
+    ldpd=no
+    nhrpd=no
+    eigrpd=no
+    babeld=no
+    sharpd=no
+    pbrd=no
+    bfdd=no
+    fabricd=no
+    vrrpd=no
+    pathd=no
 
-  sleep 2
-done
+    vtysh_enable=yes
+    zebra_options="  -A 127.0.0.1 -s 90000000"
+    bgpd_options="   -A 127.0.0.1"
+    staticd_options="-A 127.0.0.1"
+    watchfrr_options=""
+    EOF
 
-if [ -z "$MGMT_IF" ] || [ -z "$INTERNAL_IF" ]; then
-  echo "Could not map mgmt/internal interfaces from ENI MAC addresses" >&2
-  exit 1
-fi
+    cat >/etc/frr/frr.conf <<EOF
+    frr defaults traditional
+    hostname tailscale-subnet-router
+    service integrated-vtysh-config
+    !
+    EOF
 
-cat >/usr/local/sbin/configure-linux-routing.sh <<'EOF'
-#!/bin/bash
-set -euxo pipefail
+    IFS=',' read -ra EXPORT_ROUTES <<< "$BGP_EXPORT_ROUTES"
+    for route in "$${EXPORT_ROUTES[@]}"; do
+      echo "    ip route $route blackhole 250" >>/etc/frr/frr.conf
+    done
 
-MGMT_IF="__MGMT_IF__"
-INTERNAL_IF="__INTERNAL_IF__"
-MGMT_GATEWAY="__MGMT_GATEWAY__"
-INTERNAL_GATEWAY="__INTERNAL_GATEWAY__"
-INTERNAL_VPC_CIDR="__INTERNAL_VPC_CIDR__"
-INTERNAL_PRIVATE_IP="__INTERNAL_PRIVATE_IP__"
-INTERNAL_EXTRA_ROUTES="__INTERNAL_EXTRA_ROUTES__"
+    cat >>/etc/frr/frr.conf <<EOF
+    !
+    router bgp 64510
+     bgp router-id 172.16.1.2
+     no bgp ebgp-requires-policy
+     neighbor 172.16.1.1 remote-as 64500
+     neighbor 172.16.1.1 description F5_XC_CE_Tunnel_IP
+     neighbor 172.16.1.1 ebgp-multihop 255
+     neighbor 172.16.1.1 update-source ipsec0
+     !
+     address-family ipv4 unicast
+    EOF
 
-ip route del default dev "$INTERNAL_IF" || true
-ip route replace default via "$MGMT_GATEWAY" dev "$MGMT_IF" metric 100
-ip route replace "$INTERNAL_VPC_CIDR" via "$INTERNAL_GATEWAY" dev "$INTERNAL_IF" src "$INTERNAL_PRIVATE_IP" metric 50
+    for route in "$${EXPORT_ROUTES[@]}"; do
+      echo "      network $route" >>/etc/frr/frr.conf
+    done
 
-for route in $INTERNAL_EXTRA_ROUTES; do
-  ip route replace "$route" via "$INTERNAL_GATEWAY" dev "$INTERNAL_IF" src "$INTERNAL_PRIVATE_IP" metric 40
-done
-EOF
+    cat >>/etc/frr/frr.conf <<EOF
+      neighbor 172.16.1.1 soft-reconfiguration inbound
+      neighbor 172.16.1.1 route-map EXPORT-LOCAL out
+     exit-address-family
+    exit
+    !
+    EOF
 
-sed -i \
-  -e "s|__MGMT_IF__|$MGMT_IF|g" \
-  -e "s|__INTERNAL_IF__|$INTERNAL_IF|g" \
-  -e "s|__MGMT_GATEWAY__|$MGMT_GATEWAY|g" \
-  -e "s|__INTERNAL_GATEWAY__|$INTERNAL_GATEWAY|g" \
-  -e "s|__INTERNAL_VPC_CIDR__|$INTERNAL_VPC_CIDR|g" \
-  -e "s|__INTERNAL_PRIVATE_IP__|$INTERNAL_PRIVATE_IP|g" \
-  -e "s|__INTERNAL_EXTRA_ROUTES__|$INTERNAL_EXTRA_ROUTES|g" \
-  /usr/local/sbin/configure-linux-routing.sh
+    seq=10
+    for route in "$${EXPORT_ROUTES[@]}"; do
+      echo "    ip prefix-list LOCAL-ROUTES seq $seq permit $route" >>/etc/frr/frr.conf
+      seq=$((seq + 10))
+    done
 
-chmod 0755 /usr/local/sbin/configure-linux-routing.sh
+    cat >>/etc/frr/frr.conf <<EOF
+    !
+    route-map EXPORT-LOCAL permit 10
+     match ip address prefix-list LOCAL-ROUTES
+    exit
+    !
+    EOF
 
-cat >/etc/systemd/system/configure-linux-routing.service <<'EOF'
-[Unit]
-Description=Configure Linux multi-interface routing
-After=network-online.target
-Wants=network-online.target
+    chown frr:frr /etc/frr/daemons /etc/frr/frr.conf
+    chmod 0640 /etc/frr/daemons /etc/frr/frr.conf
 
-[Service]
-Type=oneshot
-ExecStart=/usr/local/sbin/configure-linux-routing.sh
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat >/etc/sysctl.d/99-multinic-tailscale.conf <<'EOF'
-net.ipv4.ip_forward = 1
-net.ipv4.conf.all.rp_filter = 2
-net.ipv4.conf.default.rp_filter = 2
-EOF
-
-cat >>/etc/sysctl.d/99-multinic-tailscale.conf <<EOF
-net.ipv4.conf.$MGMT_IF.rp_filter = 2
-net.ipv4.conf.$INTERNAL_IF.rp_filter = 2
-EOF
-
-sysctl --system
-systemctl daemon-reload
-systemctl enable --now configure-linux-routing.service
-
-apt-get update
-apt-get install -y \
-  ca-certificates \
-  curl \
-  gnupg \
-  nano \
-  nginx \
-  iputils-ping \
-  traceroute \
-  charon-systemd \
-  strongswan \
-  strongswan-swanctl
-
-cat >/var/www/html/index.html <<EOF
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AWS Region: $AWS_REGION</title>
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-family: Arial, Helvetica, sans-serif;
-      color: #1f2933;
-      background: #f4f7fb;
+    mkdir -p /etc/strongswan.d/charon
+    cat >/etc/strongswan.d/charon/vici.conf <<EOF
+    vici {
+        load = yes
+        socket = unix:///var/run/charon.vici
     }
-    main {
-      text-align: center;
-      padding: 2rem;
-    }
-    h1 {
-      margin: 0 0 1rem;
-      font-size: 2.5rem;
-    }
-    p {
-      margin: 0;
-      font-size: 1.25rem;
-    }
-    strong {
-      color: #0067b8;
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>NGINX on AWS</h1>
-    <p>server <strong>$SERVER_NUMBER</strong></p>
-    <p>Serving from AWS region <strong>$AWS_REGION</strong></p>
-  </main>
-</body>
-</html>
-EOF
+    EOF
 
-cp /var/www/html/index.html /var/www/html/index.nginx-debian.html
-systemctl enable --now nginx
+    mkdir -p /etc/swanctl/conf.d
+    cat >/etc/swanctl/conf.d/f5xc-ce.conf <<EOF
+    connections {
+      f5xc-ce {
+        version = 2
 
-if [ "$ENABLE_F5XC_CE_IPSEC" = "true" ]; then
-  if [ -z "$F5XC_CE_IPSEC_PSK" ]; then
-    echo "F5 XC CE IPsec is enabled but no PSK was provided" >&2
-    exit 1
-  fi
+        local_addrs = $LOCAL_PRIVATE_IP
+        remote_addrs = $REMOTE_PRIVATE_IP
 
-  cat >/usr/local/sbin/configure-f5xc-ipsec-interface.sh <<'EOF'
-#!/bin/bash
-set -euxo pipefail
+        proposals = aes256-sha256-modp2048
 
-INTERNAL_IF="__INTERNAL_IF__"
-IPSEC_IF="__IPSEC_IF__"
-IPSEC_IF_ID="__IPSEC_IF_ID__"
-LOCAL_TUNNEL_IP="__LOCAL_TUNNEL_IP__"
-REMOTE_TUNNEL_IP="__REMOTE_TUNNEL_IP__"
-REMOTE_ROUTES="__REMOTE_ROUTES__"
+        if_id_in = 42
+        if_id_out = 42
 
-modprobe xfrm_interface || true
+        mobike = no
+        dpd_delay = 30s
 
-if ! ip link show "$IPSEC_IF" >/dev/null 2>&1; then
-  ip link add "$IPSEC_IF" type xfrm dev "$INTERNAL_IF" if_id "$IPSEC_IF_ID"
-fi
+        local {
+          auth = psk
+          id = $LOCAL_PRIVATE_IP
+        }
 
-ip link set "$IPSEC_IF" up
-ip addr replace "$LOCAL_TUNNEL_IP" dev "$IPSEC_IF"
+        remote {
+          auth = psk
+          id = $REMOTE_PRIVATE_IP
+        }
 
-for route in $REMOTE_ROUTES; do
-  ip route replace "$route" dev "$IPSEC_IF" src "$${LOCAL_TUNNEL_IP%/*}" metric 30
-done
+        children {
+          vip-ranges {
+            local_ts = 0.0.0.0/0
+            remote_ts = 0.0.0.0/0
 
-ip route replace "$REMOTE_TUNNEL_IP/32" dev "$IPSEC_IF" src "$${LOCAL_TUNNEL_IP%/*}" metric 30
-EOF
+            if_id_in = 42
+            if_id_out = 42
 
-  sed -i \
-    -e "s|__INTERNAL_IF__|$INTERNAL_IF|g" \
-    -e "s|__IPSEC_IF__|$F5XC_CE_IPSEC_INTERFACE_NAME|g" \
-    -e "s|__IPSEC_IF_ID__|$F5XC_CE_IPSEC_INTERFACE_ID|g" \
-    -e "s|__LOCAL_TUNNEL_IP__|$F5XC_CE_IPSEC_LOCAL_TUNNEL_IP|g" \
-    -e "s|__REMOTE_TUNNEL_IP__|$F5XC_CE_IPSEC_REMOTE_TUNNEL_IP|g" \
-    -e "s|__REMOTE_ROUTES__|$${F5XC_CE_IPSEC_REMOTE_ROUTES//,/ }|g" \
-    /usr/local/sbin/configure-f5xc-ipsec-interface.sh
+            esp_proposals = aes256-sha256-modp2048
 
-  chmod 0755 /usr/local/sbin/configure-f5xc-ipsec-interface.sh
-
-  cat >/etc/systemd/system/configure-f5xc-ipsec-interface.service <<'EOF'
-[Unit]
-Description=Configure route-based IPsec XFRM interface for F5 XC CE
-After=configure-linux-routing.service
-Requires=configure-linux-routing.service
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/sbin/configure-f5xc-ipsec-interface.sh
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-  cat >/etc/swanctl/conf.d/f5xc-ce.conf <<EOF
-connections {
-  f5xc-ce {
-    version = 2
-    local_addrs = $INTERNAL_PRIVATE_IP
-    remote_addrs = $F5XC_CE_IPSEC_PEER_IP
-    proposals = $F5XC_CE_IPSEC_IKE_PROPOSALS
-    if_id_in = $F5XC_CE_IPSEC_INTERFACE_ID
-    if_id_out = $F5XC_CE_IPSEC_INTERFACE_ID
-    mobike = no
-    dpd_delay = 30s
-    local {
-      auth = psk
-      id = $INTERNAL_PRIVATE_IP
-    }
-    remote {
-      auth = psk
-      id = $F5XC_CE_IPSEC_PEER_IP
-    }
-    children {
-      vip-ranges {
-        local_ts = 0.0.0.0/0
-        remote_ts = 0.0.0.0/0
-        if_id_in = $F5XC_CE_IPSEC_INTERFACE_ID
-        if_id_out = $F5XC_CE_IPSEC_INTERFACE_ID
-        esp_proposals = $F5XC_CE_IPSEC_ESP_PROPOSALS
-        start_action = start
-        dpd_action = restart
+            start_action = start
+            dpd_action = restart
+          }
+        }
       }
     }
-  }
-}
 
-secrets {
-  ike-f5xc-ce {
-    id-1 = $INTERNAL_PRIVATE_IP
-    id-2 = $F5XC_CE_IPSEC_PEER_IP
-    secret = "$F5XC_CE_IPSEC_PSK"
-  }
-}
-EOF
+    secrets {
+      ike-f5xc-ce {
+        id-1 = $LOCAL_PRIVATE_IP
+        id-2 = $REMOTE_PRIVATE_IP
+        secret = "$IPSEC_PSK"
+      }
+    }
+    EOF
+    install -m 0600 /etc/swanctl/conf.d/f5xc-ce.conf /etc/swanctl/swanctl.conf
 
-  chmod 0600 /etc/swanctl/conf.d/f5xc-ce.conf
-  systemctl daemon-reload
-  systemctl enable --now configure-f5xc-ipsec-interface.service
-  systemctl enable --now strongswan || systemctl enable --now strongswan-starter
-  systemctl restart strongswan || systemctl restart strongswan-starter
-  swanctl --load-all
-  swanctl --initiate --child vip-ranges || true
-fi
+    systemctl enable strongswan-starter
+    if ! systemctl restart strongswan-starter; then
+      systemctl status strongswan-starter --no-pager || true
+      journalctl -u strongswan-starter --no-pager -n 100 || true
+      exit 1
+    fi
 
-curl -fsSL https://tailscale.com/install.sh | sh
-systemctl enable --now tailscaled
+    for attempt in $(seq 1 30); do
+      if swanctl --stats >/dev/null 2>&1; then
+        if swanctl --load-all --file /etc/swanctl/swanctl.conf --noprompt; then
+          swanctl --list-conns
+          exit 0
+        fi
+        echo "StrongSwan VICI is ready, but swanctl config load failed on attempt $attempt"
+      fi
+      echo "Waiting for StrongSwan VICI socket, attempt $attempt"
+      sleep 1
+    done
 
-cat >/etc/systemd/system/tailscale-logout-on-shutdown.service <<'EOF'
-[Unit]
-Description=Logout Tailscale on shutdown
-After=network-online.target tailscaled.service
-Wants=network-online.target
-Requires=tailscaled.service
+    systemctl status strongswan-starter --no-pager || true
+    journalctl -u strongswan-starter --no-pager -n 100 || true
+    exit 1
+- path: /etc/systemd/system/configure-xfrm-ipsec.service
+  owner: root:root
+  permissions: '0644'
+  content: |
+    [Unit]
+    Description=Configure XFRM interface and StrongSwan connection
+    After=network-online.target configure-aws-routing.service
+    Wants=network-online.target
+    Requires=configure-aws-routing.service
 
-[Service]
-Type=oneshot
-ExecStart=/bin/true
-ExecStop=/bin/sh -c '/usr/bin/tailscale logout --reason=terraform-destroy || true'
-RemainAfterExit=yes
+    [Service]
+    Type=oneshot
+    ExecStart=/bin/bash -x /usr/local/sbin/configure-xfrm-ipsec.sh
+    RemainAfterExit=yes
 
-[Install]
-WantedBy=multi-user.target
-EOF
+    [Install]
+    WantedBy=multi-user.target
+- path: /etc/sysctl.d/99-tailscale-subnet-router.conf
+  owner: root:root
+  permissions: '0644'
+  content: |
+    net.ipv4.ip_forward=1
+    net.ipv4.conf.all.rp_filter=2
+    net.ipv4.conf.default.rp_filter=2
+- path: /usr/local/sbin/start-frr-with-retry.sh
+  owner: root:root
+  permissions: '0755'
+  content: |
+    #!/bin/bash
+    set -euo pipefail
+    exec > >(tee -a /var/log/start-frr-with-retry.log) 2>&1
+    set -x
 
-systemctl daemon-reload
-systemctl enable --now tailscale-logout-on-shutdown.service
+    systemctl daemon-reload
+    systemctl enable frr
 
-if [ -n "$TAILSCALE_AUTH_KEY" ]; then
-  if [ "$ENABLE_TAILSCALE_SUBNET_ROUTER" = "true" ]; then
-    tailscale up \
-      --authkey="$TAILSCALE_AUTH_KEY" \
-      --hostname="$HOSTNAME_VALUE" \
-      --advertise-tags="tag:$TAILSCALE_TAG" \
-      --advertise-routes="$TAILSCALE_ADVERTISE_ROUTES" \
-      --advertise-exit-node=false \
-      --accept-dns=false \
-      --snat-subnet-routes=false \
-      --netfilter-mode=off
-  else
-    tailscale up \
-      --authkey="$TAILSCALE_AUTH_KEY" \
-      --hostname="$HOSTNAME_VALUE" \
-      --accept-routes=true \
-      --accept-dns=true
-  fi
-fi
+    for attempt in $(seq 1 10); do
+      systemctl restart frr || true
+      sleep 3
+
+      if systemctl is-active --quiet frr; then
+        vtysh -c 'show running-config' >/dev/null
+        systemctl status frr --no-pager || true
+        exit 0
+      fi
+
+      systemctl status frr --no-pager || true
+      journalctl -u frr --no-pager -n 100 || true
+    done
+
+    echo "FRR failed to become active after retries" >&2
+    exit 1
+
+runcmd:
+ - hostnamectl set-hostname '${hostname}'
+ - systemctl daemon-reload
+ - systemctl stop frr || true
+ - systemctl enable configure-aws-routing.service
+ - systemctl start configure-aws-routing.service
+ - mkdir -p /var/www/html
+ - cp /tmp/nginx-index.html /var/www/html/index.html
+ - cp /tmp/nginx-index.html /var/www/html/index.nginx-debian.html
+ - systemctl restart nginx
+ - curl -fsSL https://tailscale.com/install.sh | sh
+ - systemctl daemon-reload
+ - systemctl enable tailscaled
+ - systemctl restart tailscaled
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router --advertise-tags=tag:'${tailscale_tag}' --advertise-routes='${tailscale_advertise_routes}' --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
+ - systemctl enable configure-xfrm-ipsec.service
+ - systemctl start configure-xfrm-ipsec.service
+ - /usr/local/sbin/start-frr-with-retry.sh

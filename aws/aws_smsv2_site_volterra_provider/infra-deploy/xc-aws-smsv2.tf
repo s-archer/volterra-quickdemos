@@ -17,7 +17,8 @@ resource "aws_instance" "xc" {
   instance_type = "m5.2xlarge"
 
   user_data = templatefile("${path.module}/templates/user-data.tpl", {
-    cluster_name = format("%s-node-%s", local.f5xc_sms_name, count.index),
+    cluster_name = volterra_securemesh_site_v2.site[count.index].name
+    hostname     = format("%s-node-%s", local.f5xc_sms_name, count.index)
     token        = volterra_token.smsv2-token[count.index].id
   })
 
@@ -25,7 +26,7 @@ resource "aws_instance" "xc" {
     volume_size           = 100
     volume_type           = "gp2"
     delete_on_termination = true
-  }
+  } 
 
   key_name = aws_key_pair.demo.key_name
 
@@ -129,8 +130,6 @@ resource "aws_eip" "f5xc-outside" {
   }
 }
 
-
-
 resource "volterra_token" "smsv2-token" {
   count      = var.f5xc_sms_node_count
   depends_on = [volterra_securemesh_site_v2.site]
@@ -140,7 +139,11 @@ resource "volterra_token" "smsv2-token" {
   site_name  = volterra_securemesh_site_v2.site[count.index].name
 
   lifecycle {
-    ignore_changes = all
+    ignore_changes = [
+      annotations,
+      id,
+      labels
+    ]
   }
 }
 
@@ -178,19 +181,26 @@ resource "volterra_securemesh_site_v2" "site" {
   namespace          = "system"
   description        = var.f5xc_sms_description
   block_all_services = true
-  disable_ha         = true
+  enable_ha          = false
 
   logs_streaming_disabled = true
   labels = {
     "virtual-site-terraform" = volterra_known_label.label.value
     "ves.io/provider"        = "ves-io-AWS"
+    "arch"                   = "site-mesh-group"
+  }
+
+  site_mesh_group_on_slo {
+    sm_connection_public_ip = true
   }
 
   aws {
     not_managed {
       node_list {
-        hostname = format("node-%s", count.index)
+        hostname = format("%s-node-%s", local.f5xc_sms_name, count.index)
+        public_ip = aws_eip.f5xc-outside[count.index].public_ip
         type     = "Control"
+
         interface_list {
           name        = "ens5"
           priority    = 0
@@ -208,7 +218,6 @@ resource "volterra_securemesh_site_v2" "site" {
           }
         }
 
-        # Interface 2: ens6 (site_local_inside_network = true)
         interface_list {
           name        = "ens6"
           priority    = 0

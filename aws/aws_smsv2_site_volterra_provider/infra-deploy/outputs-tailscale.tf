@@ -11,7 +11,11 @@ output "tailscale-router-internal" {
 }
 
 output "tailscale-advertise-routes" {
-  value = local.tailscale_advertise_routes
+  value = local.remote_tailnet_routes
+}
+
+output "bgp-export-routes" {
+  value = local.local_tailnet_routes
 }
 
 output "tailscale-router-ipsec-psk" {

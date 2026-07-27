@@ -19,7 +19,8 @@ data "aws_ami" "ubuntu" {
 
 locals {
   internal_vpc_cidr                   = aws_vpc.f5xc.cidr_block
-  tailscale_advertise_routes          = var.tailscale_advertise_routes
+  local_tailnet_routes                = var.local_tailnet_routes
+  remote_tailnet_routes               = var.remote_tailnet_routes
   tailscale_subnet_router_ipsec_peer  = var.f5xc_ce_ipsec_peer_ip != "" ? var.f5xc_ce_ipsec_peer_ip : aws_network_interface.f5xc-outside[0].private_ip
   tailscale_subnet_router_ipsec_psk   = var.f5xc_ce_ipsec_psk != "" ? var.f5xc_ce_ipsec_psk : random_password.tailscale_subnet_router_ipsec_psk.result
   tailscale_subnet_router_tunnel_cidr = split("/", var.f5xc_ce_ipsec_local_tunnel_ip)[1]

@@ -41,18 +41,17 @@ resource "aws_instance" "linux" {
 
   ami = data.aws_ami.ubuntu.id
   user_data = base64encode(templatefile("${path.module}/templates/nginx.tpl", {
-    hostname                   = var.linux_server_count == 1 ? "linux-server" : "linux-server-${count.index + 1}"
-    server_number              = count.index + 1
-    aws_region                 = var.region
-    mgmt_mac                   = aws_network_interface.mgmt[count.index].mac_address
-    internal_mac               = aws_network_interface.internal[count.index].mac_address
-    mgmt_gateway               = cidrhost(aws_subnet.eks_bip_mgmt[0].cidr_block, 1)
-    internal_gateway           = cidrhost(aws_subnet.eks_bip_inside[0].cidr_block, 1)
-    internal_vpc_cidr          = local.internal_vpc_cidr
-    internal_private_ip        = aws_network_interface.internal[count.index].private_ip
-    tailscale_auth_key         = var.tailscale_auth_key
-    tailscale_advertise_routes = join(",", local.tailscale_advertise_routes)
-    internal_extra_routes      = ""
+    hostname              = var.linux_server_count == 1 ? "linux-server" : "linux-server-${count.index + 1}"
+    server_number         = count.index + 1
+    aws_region            = var.region
+    mgmt_mac              = aws_network_interface.mgmt[count.index].mac_address
+    internal_mac          = aws_network_interface.internal[count.index].mac_address
+    mgmt_gateway          = cidrhost(aws_subnet.eks_bip_mgmt[0].cidr_block, 1)
+    internal_gateway      = cidrhost(aws_subnet.eks_bip_inside[0].cidr_block, 1)
+    internal_vpc_cidr     = local.internal_vpc_cidr
+    internal_private_ip   = aws_network_interface.internal[count.index].private_ip
+    tailscale_auth_key    = var.tailscale_auth_key
+    internal_extra_routes = ""
   }))
   instance_type = "t3.small"
   key_name      = aws_key_pair.demo.key_name
@@ -69,7 +68,7 @@ resource "aws_instance" "linux" {
   }
 
   tags = {
-    Name  = var.linux_server_count == 1 ? "${var.prefix}open-vpn-server" : "${var.prefix}open-vpn-server-${count.index + 1}"
+    Name  = var.linux_server_count == 1 ? "${var.prefix}-tailscale-nginx-web" : "${var.prefix}-tailscale-nginx-web-${count.index + 1}"
     Env   = "aws"
     UK-SE = var.uk_se_name
   }

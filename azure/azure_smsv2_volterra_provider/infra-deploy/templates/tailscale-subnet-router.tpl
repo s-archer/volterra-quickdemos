@@ -9,9 +9,6 @@ packages:
  - strongswan
  - strongswan-swanctl
 
-bootcmd:
- - mkdir -p /etc/systemd/system/frr.service.d
-
 write_files:
 - path: /tmp/nginx-index.html
   owner: root:root
@@ -121,6 +118,10 @@ write_files:
     hostname tailscale-subnet-router
     service integrated-vtysh-config
     !
+%{ for route in bgp_export_route_list ~}
+    ip route ${route} blackhole 250
+%{ endfor ~}
+    !
     router bgp 64510
      bgp router-id 172.16.1.2
      no bgp ebgp-requires-policy
@@ -130,9 +131,21 @@ write_files:
      neighbor 172.16.1.1 update-source ipsec0
      !
      address-family ipv4 unicast
-      network 100.81.0.0/16
+%{ for route in bgp_export_route_list ~}
+      network ${route}
+%{ endfor ~}
       neighbor 172.16.1.1 soft-reconfiguration inbound
+      neighbor 172.16.1.1 route-map EXPORT-LOCAL out
      exit-address-family
+    exit
+    !
+%{ for route in bgp_export_route_list ~}
+    ip prefix-list LOCAL-ROUTES seq ${10 + index(bgp_export_route_list, route) * 10} permit ${route}
+%{ endfor ~}
+    !
+    route-map EXPORT-LOCAL permit 10
+     match ip address prefix-list LOCAL-ROUTES
+    exit
     !
     EOF
 
@@ -244,15 +257,38 @@ write_files:
   permissions: '0644'
   content: |
     net.ipv4.ip_forward=1
-- path: /etc/systemd/system/frr.service.d/override.conf
+- path: /usr/local/sbin/start-frr-with-retry.sh
   owner: root:root
-  permissions: '0644'
+  permissions: '0755'
   content: |
-    [Unit]
-    After=configure-xfrm-ipsec.service
+    #!/bin/bash
+    set -euo pipefail
+    exec > >(tee -a /var/log/start-frr-with-retry.log) 2>&1
+    set -x
+
+    systemctl daemon-reload
+    systemctl enable frr
+
+    for attempt in $(seq 1 10); do
+      systemctl restart frr || true
+      sleep 3
+
+      if systemctl is-active --quiet frr; then
+        vtysh -c 'show running-config' >/dev/null
+        systemctl status frr --no-pager || true
+        exit 0
+      fi
+
+      systemctl status frr --no-pager || true
+      journalctl -u frr --no-pager -n 100 || true
+    done
+
+    echo "FRR failed to become active after retries" >&2
+    exit 1
 
 runcmd:
  - mkdir -p /var/www/html
+ - systemctl stop frr || true
  - cp /tmp/nginx-index.html /var/www/html/index.html
  - cp /tmp/nginx-index.html /var/www/html/index.nginx-debian.html
  - systemctl restart nginx
@@ -260,8 +296,7 @@ runcmd:
  - systemctl daemon-reload
  - systemctl enable tailscaled
  - systemctl restart tailscaled
- - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router --advertise-tags=tag:'${tailscale_tag}' --advertise-routes=192.168.0.0/16,172.16.0.0/16,100.64.0.0/16 --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router --advertise-tags=tag:'${tailscale_tag}' --advertise-routes='${tailscale_advertise_routes}' --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
  - systemctl enable configure-xfrm-ipsec.service
  - systemctl start configure-xfrm-ipsec.service
- - systemctl enable frr
- - systemctl restart frr
+ - /usr/local/sbin/start-frr-with-retry.sh

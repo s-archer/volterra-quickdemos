@@ -46,8 +46,9 @@ resource "aws_instance" "tailscale_router" {
     enable_tailscale_subnet_router = true
     tailscale_auth_key             = var.tailscale_auth_key
     tailscale_tag                  = var.tailscale_tag
-    tailscale_advertise_routes     = join(",", local.tailscale_advertise_routes)
-    internal_extra_routes          = join(" ", tolist(setsubtract(toset(local.tailscale_advertise_routes), toset(var.f5xc_ce_ipsec_remote_routes))))
+    bgp_export_routes              = join(",", local.local_tailnet_routes)
+    tailscale_advertise_routes     = join(",", local.remote_tailnet_routes)
+    internal_extra_routes          = join(" ", tolist(setsubtract(toset(local.local_tailnet_routes), toset(var.f5xc_ce_ipsec_remote_routes))))
     enable_f5xc_ce_ipsec           = true
     f5xc_ce_ipsec_peer_ip          = local.tailscale_subnet_router_ipsec_peer
     f5xc_ce_ipsec_psk              = local.tailscale_subnet_router_ipsec_psk
@@ -74,7 +75,7 @@ resource "aws_instance" "tailscale_router" {
   }
 
   tags = {
-    Name  = "${var.prefix}tailscale-subnet-router"
+    Name  = "${var.prefix}-tailscale-subnet-router"
     Env   = "aws"
     UK-SE = var.uk_se_name
   }

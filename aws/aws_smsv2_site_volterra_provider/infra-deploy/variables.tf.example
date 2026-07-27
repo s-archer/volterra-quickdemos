@@ -113,10 +113,16 @@ variable "tailscale_tag" {
   default     = "tsr-aws"
 }
 
-variable "tailscale_advertise_routes" {
+variable "local_tailnet_routes" {
   type        = list(string)
-  description = "Routes advertised by the dedicated Tailscale subnet-router VM."
-  default     = ["10.99.0.0/16"]
+  description = "Local tailnet routes exported from FRR/BGP to the F5 XC CE."
+  default     = ["100.64.0.0/16"]
+}
+
+variable "remote_tailnet_routes" {
+  type        = list(string)
+  description = "Remote tailnet routes advertised by the dedicated Tailscale subnet-router VM into this tailnet."
+  default     = ["100.81.0.0/16"]
 }
 
 variable "f5xc_ce_ipsec_peer_ip" {
@@ -135,7 +141,7 @@ variable "f5xc_ce_ipsec_psk" {
 variable "f5xc_ce_ipsec_remote_routes" {
   type        = list(string)
   description = "Remote traffic selectors protected by the IPsec tunnel to F5 XC CE."
-  default     = ["10.99.0.0/16"]
+  default     = ["100.64.0.0/16"]
 }
 
 variable "f5xc_ce_ipsec_interface_name" {
