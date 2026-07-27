@@ -7,17 +7,17 @@ locals {
 
 variable "f5xc_ami" {
   description = "value of ami to use for XC instance - get this from XC UI (click site ... and select 'copy image name')"
-  default     = "*f5xc-ce-crt-20251002*"
+  default     = "*f5xc-ce-crt-20260201-0178-9.2026.14*"
 }
 
 variable "f5xc_sms_node_count" {
   description = "Number of nodes (sites) to deploy"
-  default     = 3
+  default     = 1
 }
 
 variable "f5xc_sms_description" {
   type    = string
-  default = "Arch Azure smsv2 site created with Terraform"
+  default = "Example AWS smsv2 site created with Terraform"
 }
 
 variable "region" {
@@ -121,8 +121,8 @@ variable "local_tailnet_routes" {
 
 variable "remote_tailnet_routes" {
   type        = list(string)
-  description = "Remote tailnet routes advertised by the dedicated Tailscale subnet-router VM into this tailnet."
-  default     = ["100.81.0.0/16"]
+  description = "Remote tailnet routes, tunnel IPs routes, and CE VIP routes advertised by the dedicated Tailscale subnet-router VM into this tailnet."
+  default     = ["100.81.0.0/16", "10.0.0.0/16", "172.16.0.0/16"]
 }
 
 variable "f5xc_ce_ipsec_peer_ip" {

@@ -62,8 +62,8 @@ variable "local_tailnet_routes" {
 
 variable "remote_tailnet_routes" {
   type        = list(string)
-  description = "Remote tailnet routes advertised by the dedicated Tailscale subnet-router VM into this tailnet."
-  default     = ["100.64.0.0/16"]
+  description = "Remote tailnet routes, tunnel IPs routes, and CE VIP routes advertised by the dedicated Tailscale subnet-router VM into this tailnet."
+  default     = ["100.64.0.0/16", "172.16.0.0/16", "192.168.0.0/16"]
 }
 
 variable "f5xc_sms_node_count" {
@@ -150,4 +150,10 @@ variable "eks_k8s_namespace" {
   type        = string
   description = "EKS namespace used for XC discovery/output context."
   default     = "aws-eks"
+}
+
+variable "f5xc_tenant" {
+  type        = string
+  description = "Full tenant name for the Volterra tenant where the XC will be deployed. This is used to create the CE site and other objects in the Volterra tenant."
+  default     = "example-tenant"
 }
