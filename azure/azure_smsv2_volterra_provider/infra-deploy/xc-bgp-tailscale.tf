@@ -42,8 +42,8 @@ resource "volterra_external_connector" "tailscale_azure" {
       }
 
       tunnel_eps {
-        node             = format("node-%s", count.index)
-        interface        = format("ves-io-securemesh-site-v2-%s-network-%s-eth0-0", volterra_securemesh_site_v2.site[0].name, format("node-%s", count.index))
+        node             = format("%s-node-%s", local.f5xc_sms_name, count.index)
+        interface        = format("ves-io-securemesh-site-v2-%s-network-%s-eth0-0", volterra_securemesh_site_v2.site[0].name, format("%s-node-%s", local.f5xc_sms_name, count.index))
         local_tunnel_ip  = "172.16.1.1/24"
         remote_tunnel_ip = "172.16.1.2/24"
       }

@@ -34,7 +34,7 @@ resource "aws_eip" "tailscale_router_mgmt" {
 resource "aws_instance" "tailscale_router" {
   ami = data.aws_ami.ubuntu.id
   user_data = base64encode(templatefile("${path.module}/templates/tailscale-subnet-router.tpl", {
-    hostname                       = "tailscale-subnet-router"
+    hostname                       = "aws-tailscale-subnet-router"
     server_number                  = 0
     aws_region                     = var.region
     mgmt_mac                       = aws_network_interface.tailscale_router_mgmt.mac_address

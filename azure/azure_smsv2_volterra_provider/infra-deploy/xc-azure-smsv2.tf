@@ -29,16 +29,16 @@ resource "volterra_securemesh_site_v2" "site" {
     not_managed {
       node_list {
 
-        hostname = format("node-%s", count.index)
+        hostname  = format("%s-node-%s", local.f5xc_sms_name, count.index)
         public_ip = azurerm_public_ip.outside_public_ip[count.index].ip_address
-        type     = "Control"
+        type      = "Control"
 
         interface_list {
           name        = "eth0"
           priority    = 0
           mtu         = 0
           dhcp_client = true
-          
+
           ethernet_interface {
             device = "eth0"
             mac    = ""
@@ -55,7 +55,7 @@ resource "volterra_securemesh_site_v2" "site" {
           priority    = 0
           mtu         = 0
           dhcp_client = true
-          
+
           ethernet_interface {
             device = "eth1"
             mac    = ""
@@ -64,7 +64,7 @@ resource "volterra_securemesh_site_v2" "site" {
           network_option {
             site_local_network        = false
             site_local_inside_network = true
-          }    
+          }
         }
       }
     }
@@ -152,12 +152,13 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
   }
 
   os_profile {
-    computer_name  = format("node-%s", count.index)
+    computer_name  = format("%s-node-%s", local.f5xc_sms_name, count.index)
     admin_username = "volterra-admin"
     admin_password = random_string.password.result
-    custom_data    = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
+    custom_data = base64encode(templatefile("${path.module}/templates/user-data.tpl", {
       cluster_name = volterra_securemesh_site_v2.site[count.index].name,
-      token = volterra_token.smsv2-token[count.index].id
+      hostname     = format("%s-node-%s", local.f5xc_sms_name, count.index),
+      token        = volterra_token.smsv2-token[count.index].id
     }))
   }
 

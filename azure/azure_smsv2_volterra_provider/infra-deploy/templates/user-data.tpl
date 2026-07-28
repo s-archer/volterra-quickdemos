@@ -5,3 +5,5 @@ write_files:
     token: ${token}
   owner: root
   permissions: '0644'
+runcmd:
+  - hostnamectl set-hostname ${hostname}

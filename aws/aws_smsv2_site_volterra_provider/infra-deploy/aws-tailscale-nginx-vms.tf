@@ -40,8 +40,8 @@ resource "aws_instance" "linux" {
   count = var.linux_server_count
 
   ami = data.aws_ami.ubuntu.id
-  user_data = base64encode(templatefile("${path.module}/templates/nginx.tpl", {
-    hostname              = var.linux_server_count == 1 ? "linux-server" : "linux-server-${count.index + 1}"
+  user_data = base64encode(templatefile("${path.module}/templates/tailscale-nginx-app.tpl", {
+    hostname              = "aws-tailscale-nginx-${count.index + 1}"
     server_number         = count.index + 1
     aws_region            = var.region
     mgmt_mac              = aws_network_interface.mgmt[count.index].mac_address
@@ -68,7 +68,7 @@ resource "aws_instance" "linux" {
   }
 
   tags = {
-    Name  = var.linux_server_count == 1 ? "${var.prefix}-tailscale-nginx-web" : "${var.prefix}-tailscale-nginx-web-${count.index + 1}"
+    Name  = var.linux_server_count == 1 ? "${var.prefix}-aws-tailscale-nginx" : "${var.prefix}-aws-tailscale-nginx-${count.index + 1}"
     Env   = "aws"
     UK-SE = var.uk_se_name
   }

@@ -42,6 +42,7 @@ resource "azurerm_network_interface" "nginx" {
 resource "azurerm_linux_virtual_machine" "nginx" {
   count               = var.vm_count
   name                = "${var.prefix}-vm-${count.index + 1}"
+  computer_name       = "azure-tailscale-nginx-${count.index + 1}"
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   size                = "Standard_DS1_v2"
@@ -56,11 +57,11 @@ resource "azurerm_linux_virtual_machine" "nginx" {
     azurerm_network_interface.nginx[count.index].id
   ]
 
-  custom_data = base64encode(templatefile("${path.module}/templates/nginx.tpl", {
+  custom_data = base64encode(templatefile("${path.module}/templates/tailscale-nginx-app.tpl", {
     azure_region       = var.location
     server_number      = count.index + 1
     tailscale_auth_key = var.tailscale_auth_key
-    tailscale_hostname = "${var.prefix}-nginx-${count.index + 1}"
+    tailscale_hostname = "azure-tailscale-nginx-${count.index + 1}"
   }))
 
   source_image_reference {

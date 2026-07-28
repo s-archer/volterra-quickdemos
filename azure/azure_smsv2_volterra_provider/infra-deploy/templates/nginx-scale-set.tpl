@@ -1,6 +1,5 @@
 #cloud-config
 packages:
- - curl
  - nginx
 
 write_files:
@@ -13,7 +12,7 @@ write_files:
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
-      <title>Azure Region: ${azure_region}</title>
+      <title>Azure NGINX Scale Set</title>
       <style>
         body {
           margin: 0;
@@ -44,8 +43,7 @@ write_files:
     </head>
     <body>
       <main>
-        <h1>NGINX on Azure</h1>
-        <p>server <strong>${server_number}</strong></p>
+        <h1>NGINX Scale Set on Azure</h1>
         <p>Serving from Azure region <strong>${azure_region}</strong></p>
       </main>
     </body>
@@ -56,10 +54,3 @@ runcmd:
  - cp /tmp/nginx-index.html /var/www/html/index.html
  - cp /tmp/nginx-index.html /var/www/html/index.nginx-debian.html
  - systemctl restart nginx
- - curl -fsSL https://tailscale.com/install.sh | sh
-%{ if tailscale_auth_key != "" ~}
- - systemctl enable tailscaled
- - systemctl restart tailscaled
- - tailscale up --authkey '${tailscale_auth_key}' --hostname '${tailscale_hostname}' --accept-routes=true --accept-dns=true
-
-%{ endif ~}
