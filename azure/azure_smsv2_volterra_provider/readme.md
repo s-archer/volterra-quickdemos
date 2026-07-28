@@ -37,6 +37,7 @@ Terraform files are grouped by ownership:
 Copy the public-safe example file for local use:
 
 ```bash
+cd infra-deploy
 cp variables.tf.example variables.tf
 ```
 
