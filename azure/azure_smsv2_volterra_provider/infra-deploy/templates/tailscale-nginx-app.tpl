@@ -50,6 +50,24 @@ write_files:
       </main>
     </body>
     </html>
+- path: /etc/systemd/system/tailscale-logout-on-shutdown.service
+  owner: root:root
+  permissions: '0644'
+  content: |
+    [Unit]
+    Description=Logout Tailscale on shutdown
+    After=network-online.target tailscaled.service
+    Wants=network-online.target
+    Requires=tailscaled.service
+
+    [Service]
+    Type=oneshot
+    ExecStart=/bin/true
+    ExecStop=/bin/sh -c '/usr/bin/tailscale logout --reason=terraform-destroy || true'
+    RemainAfterExit=yes
+
+    [Install]
+    WantedBy=multi-user.target
 
 runcmd:
  - hostnamectl set-hostname '${tailscale_hostname}'
@@ -61,6 +79,9 @@ runcmd:
 %{ if tailscale_auth_key != "" ~}
  - systemctl enable tailscaled
  - systemctl restart tailscaled
+ - systemctl daemon-reload
+ - systemctl enable tailscale-logout-on-shutdown.service
+ - systemctl start tailscale-logout-on-shutdown.service
  - tailscale up --authkey '${tailscale_auth_key}' --hostname '${tailscale_hostname}' --accept-routes=true --accept-dns=true
 
 %{ endif ~}

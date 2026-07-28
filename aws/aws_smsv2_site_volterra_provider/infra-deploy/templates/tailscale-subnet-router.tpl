@@ -383,6 +383,24 @@ write_files:
 
     echo "FRR failed to become active after retries" >&2
     exit 1
+- path: /etc/systemd/system/tailscale-logout-on-shutdown.service
+  owner: root:root
+  permissions: '0644'
+  content: |
+    [Unit]
+    Description=Logout Tailscale on shutdown
+    After=network-online.target tailscaled.service
+    Wants=network-online.target
+    Requires=tailscaled.service
+
+    [Service]
+    Type=oneshot
+    ExecStart=/bin/true
+    ExecStop=/bin/sh -c '/usr/bin/tailscale logout --reason=terraform-destroy || true'
+    RemainAfterExit=yes
+
+    [Install]
+    WantedBy=multi-user.target
 
 runcmd:
  - hostnamectl set-hostname '${hostname}'
@@ -398,6 +416,8 @@ runcmd:
  - systemctl daemon-reload
  - systemctl enable tailscaled
  - systemctl restart tailscaled
+ - systemctl enable tailscale-logout-on-shutdown.service
+ - systemctl start tailscale-logout-on-shutdown.service
  - tailscale up --authkey '${tailscale_auth_key}' --hostname '${hostname}' --advertise-tags=tag:'${tailscale_tag}' --advertise-routes='${tailscale_advertise_routes}' --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
  - systemctl enable configure-xfrm-ipsec.service
  - systemctl start configure-xfrm-ipsec.service
