@@ -1,0 +1,35 @@
+f5xc_api_url      = "https://example.console.ves.volterra.io/api"
+f5xc_api_p12_file = "../../../../creds/example.console.ves.volterra.io.api-creds.p12"
+f5xc_tenant       = "example-tenant"
+f5xc_namespace    = "example-namespace"
+
+lb_name    = "tailscale-nginxs"
+lb_domains = ["tailscale.example.com"]
+
+app_firewall_name      = "example-waf"
+app_firewall_namespace = "example-namespace"
+healthcheck_name       = "arch-http-generic"
+healthcheck_namespace  = "example-namespace"
+
+tailscale_tailnet              = "-"
+enable_tailscale_device_lookup = true
+
+# Enable only the environment that has already been deployed.
+enable_aws_remote_state   = true
+enable_azure_remote_state = false
+
+aws_remote_state_path   = "../../aws/aws_smsv2_site_volterra_provider/infra-deploy/terraform.tfstate"
+azure_remote_state_path = "../../azure/azure_smsv2_volterra_provider/infra-deploy/terraform.tfstate"
+
+# If remote state is disabled, provide the CE site name explicitly.
+aws_site_name   = ""
+azure_site_name = ""
+
+# When remote state is enabled, hostnames are read from infra-deploy outputs.
+# If remote state is disabled, provide hostnames here so Tailscale can resolve them.
+aws_nginx_tailnet_hostnames   = []
+azure_nginx_tailnet_hostnames = []
+
+# Fallback only. Used when enable_tailscale_device_lookup is false.
+aws_nginx_tailnet_ips   = []
+azure_nginx_tailnet_ips = []

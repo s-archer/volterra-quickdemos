@@ -25,3 +25,10 @@ output "linux-internal_self" {
 output "linux-mgmt_private" {
   value = aws_network_interface.mgmt[*].private_ip
 }
+
+output "nginx-tailnet-hostnames" {
+  value = [
+    for i in range(var.linux_server_count) :
+    "aws-tailscale-nginx-${i + 1}"
+  ]
+}

@@ -40,6 +40,7 @@ resource "azurerm_network_interface" "tailscale_subnet_router" {
 
 resource "azurerm_linux_virtual_machine" "tailscale_subnet_router" {
   name                = "${var.prefix}-tailscale-subnet-router-vm"
+  computer_name       = "azure-tailscale-subnet-router"
   location            = var.location
   resource_group_name = azurerm_resource_group.rg.name
   size                = "Standard_DS1_v2"
@@ -55,6 +56,7 @@ resource "azurerm_linux_virtual_machine" "tailscale_subnet_router" {
   ]
 
   custom_data = base64encode(templatefile("${path.module}/templates/tailscale-subnet-router.tpl", {
+    hostname         = "azure-tailscale-subnet-router"
     azure_region     = var.location
     local_private_ip = azurerm_network_interface.tailscale_subnet_router.private_ip_address
     # remote_private_ip    = azurerm_network_interface.inside_nic[0].private_ip_address

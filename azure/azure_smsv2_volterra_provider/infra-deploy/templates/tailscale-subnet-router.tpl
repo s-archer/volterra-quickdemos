@@ -115,7 +115,7 @@ write_files:
 
     cat >/etc/frr/frr.conf <<EOF
     frr defaults traditional
-    hostname tailscale-subnet-router
+    hostname ${hostname}
     service integrated-vtysh-config
     !
 %{ for route in bgp_export_route_list ~}
@@ -288,6 +288,7 @@ write_files:
 
 runcmd:
  - mkdir -p /var/www/html
+ - hostnamectl set-hostname '${hostname}'
  - systemctl stop frr || true
  - cp /tmp/nginx-index.html /var/www/html/index.html
  - cp /tmp/nginx-index.html /var/www/html/index.nginx-debian.html
@@ -296,7 +297,7 @@ runcmd:
  - systemctl daemon-reload
  - systemctl enable tailscaled
  - systemctl restart tailscaled
- - tailscale up --authkey '${tailscale_auth_key}' --hostname tailscale-subnet-router --advertise-tags=tag:'${tailscale_tag}' --advertise-routes='${tailscale_advertise_routes}' --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
+ - tailscale up --authkey '${tailscale_auth_key}' --hostname '${hostname}' --advertise-tags=tag:'${tailscale_tag}' --advertise-routes='${tailscale_advertise_routes}' --advertise-exit-node=false --accept-dns=false --snat-subnet-routes=false --netfilter-mode=off
  - systemctl enable configure-xfrm-ipsec.service
  - systemctl start configure-xfrm-ipsec.service
  - /usr/local/sbin/start-frr-with-retry.sh
