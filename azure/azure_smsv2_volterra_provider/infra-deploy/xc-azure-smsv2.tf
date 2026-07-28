@@ -4,8 +4,14 @@ resource "volterra_securemesh_site_v2" "site" {
   namespace               = "system"
   description             = var.f5xc_sms_description
   block_all_services      = true
-  logs_streaming_disabled = true
   enable_ha               = false
+  logs_streaming_disabled = true
+
+
+  admin_user_credentials {
+    ssh_key = tls_private_key.demo.public_key_openssh
+  }
+
   labels = {
     # Unhash the following block if you want to manage your own key, but make sure you change the `key` value
     # (volterra_known_label_key.key.key) = (volterra_known_label.label.value)
@@ -174,7 +180,7 @@ resource "azurerm_virtual_machine" "f5xc-nodes" {
 
   lifecycle {
     ignore_changes = [
-      tags
+
     ]
   }
 }

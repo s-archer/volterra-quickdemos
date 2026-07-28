@@ -26,7 +26,7 @@ resource "aws_instance" "xc" {
     volume_size           = 100
     volume_type           = "gp2"
     delete_on_termination = true
-  } 
+  }
 
   key_name = aws_key_pair.demo.key_name
 
@@ -176,14 +176,18 @@ resource "volterra_virtual_site" "ce" {
 }
 
 resource "volterra_securemesh_site_v2" "site" {
-  count              = var.f5xc_sms_node_count
-  name               = format("%s-node-%s", local.f5xc_sms_name, count.index)
-  namespace          = "system"
-  description        = var.f5xc_sms_description
-  block_all_services = true
-  enable_ha          = false
-
+  count                   = var.f5xc_sms_node_count
+  name                    = format("%s-node-%s", local.f5xc_sms_name, count.index)
+  namespace               = "system"
+  description             = var.f5xc_sms_description
+  block_all_services      = true
+  enable_ha               = false
   logs_streaming_disabled = true
+
+  admin_user_credentials {
+    ssh_key = tls_private_key.demo.public_key_openssh
+  }
+
   labels = {
     "virtual-site-terraform" = volterra_known_label.label.value
     "ves.io/provider"        = "ves-io-AWS"
@@ -197,9 +201,9 @@ resource "volterra_securemesh_site_v2" "site" {
   aws {
     not_managed {
       node_list {
-        hostname = format("%s-node-%s", local.f5xc_sms_name, count.index)
+        hostname  = format("%s-node-%s", local.f5xc_sms_name, count.index)
         public_ip = aws_eip.f5xc-outside[count.index].public_ip
-        type     = "Control"
+        type      = "Control"
 
         interface_list {
           name        = "ens5"
